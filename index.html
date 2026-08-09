@@ -113,28 +113,44 @@ section.cat{padding:34px 0 6px;scroll-margin-top:64px}
 .subhead{display:flex;align-items:center;gap:12px;margin:26px 0 14px;font-size:12px;letter-spacing:.18em;
   text-transform:uppercase;color:var(--gold);font-weight:700}
 .subhead:after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--gold-l),transparent)}
-.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
-.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;
-  box-shadow:var(--sh-1);display:flex;flex-direction:column;transition:.2s;position:relative}
+/* lista de cards horizontais: foto à esquerda, dados e botão à direita */
+.grid{display:grid;gap:14px;grid-template-columns:1fr}
+@media(min-width:900px){ .grid{grid-template-columns:1fr 1fr} }
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);
+  box-shadow:var(--sh-1);display:flex;flex-direction:row;align-items:stretch;gap:14px;
+  padding:14px;transition:.2s;position:relative}
 .card:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(43,34,37,.1)}
 .card.on{border-color:var(--rose);box-shadow:0 0 0 2px var(--rose-l),0 10px 28px rgba(155,18,38,.18)}
-.card .thumb{aspect-ratio:1/1;background:var(--rose-l);position:relative}
+.card .thumb{width:112px;height:112px;flex:0 0 auto;border-radius:16px;overflow:hidden;
+  background:var(--rose-l);position:relative;box-shadow:0 0 0 1px rgba(201,162,39,.34)}
 .card .thumb img{width:100%;height:100%;object-fit:cover}
-.badge-check{position:absolute;top:10px;right:10px;width:28px;height:28px;border-radius:50%;
-  background:var(--rose);color:#fff;display:none;place-items:center;font-size:15px;
+.badge-check{position:absolute;top:7px;right:7px;width:26px;height:26px;border-radius:50%;
+  background:var(--rose);color:#fff;display:none;place-items:center;font-size:14px;
   box-shadow:0 4px 12px rgba(155,18,38,.45)}
 .card.on .badge-check{display:grid}
-.card-b{padding:14px 15px 15px;display:flex;flex-direction:column;gap:7px;flex:1}
-.card-b h3{margin:0;font-size:15.5px;font-weight:600;line-height:1.3}
-.card-b p{margin:0;font-size:12.8px;color:var(--muted);line-height:1.45;flex:1}
-.meta{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:2px}
-.dur{font-size:12.5px;color:var(--ink-2);background:#F8F2F1;border-radius:999px;padding:4px 10px}
-.price{font-family:"Cormorant Garamond",serif;font-size:22px;font-weight:700;color:var(--rose-d)}
-.price small{font-family:Inter,sans-serif;font-size:10.5px;font-weight:600;color:var(--muted);display:block;line-height:1}
-.add{width:100%;margin-top:4px;border-radius:12px;padding:10px;font-size:13.5px;font-weight:600;
-  border:1px solid var(--line);background:#FCF8F7;color:var(--ink-2);transition:.16s}
-.add:hover{border-color:var(--rose);color:var(--rose-d)}
-.card.on .add{background:var(--rose);border-color:var(--rose);color:#fff}
+.card-b{padding:2px 0 0;display:flex;flex-direction:column;gap:5px;flex:1;min-width:0}
+.card-b h3{margin:0;font-size:17px;font-weight:700;line-height:1.25;letter-spacing:-.1px}
+.card-b p{margin:0;font-size:13px;color:var(--muted);line-height:1.4}
+.dur{align-self:flex-start;font-size:12.5px;color:var(--ink-2);background:#F8F2F1;
+  border-radius:999px;padding:4px 11px;margin-top:1px}
+.buy{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto;padding-top:8px}
+.price{font-family:"Cormorant Garamond",serif;font-size:25px;font-weight:700;color:var(--rose-d);
+  line-height:1;white-space:nowrap}
+.price small{font-family:Inter,sans-serif;font-size:10px;font-weight:600;color:var(--muted);
+  display:block;line-height:1;margin-bottom:2px}
+.add{flex:0 0 auto;border-radius:999px;padding:11px 24px;font-size:14.5px;font-weight:700;
+  background:linear-gradient(140deg,var(--rose),var(--rose-d));color:#fff;
+  box-shadow:0 5px 14px rgba(155,18,38,.28);transition:.16s;white-space:nowrap}
+.add:hover{filter:brightness(1.07)}
+.card.on .add{background:var(--ink);box-shadow:none}
+@media(max-width:400px){
+  .card{padding:12px;gap:11px}
+  .card .thumb{width:96px;height:96px;border-radius:14px}
+  .card-b h3{font-size:16.5px}
+  .card-b p{font-size:12.5px}
+  .price{font-size:22px}
+  .add{padding:10px 18px;font-size:13.5px}
+}
 
 /* ---------- SOBRE / EQUIPE / FOOTER ---------- */
 .about{margin:44px 0 10px;background:linear-gradient(140deg,#fff,#FFFAF8);border:1px solid var(--line);
@@ -772,11 +788,11 @@ function cardHTML(s){
     <div class="card-b">
       <h3>${s.nome}</h3>
       <p>${s.desc}</p>
-      <div class="meta">
-        <span class="dur">🕐 ${dur(s.min)}</span>
+      <span class="dur">🕐 ${dur(s.min)}</span>
+      <div class="buy">
         <span class="price">${s.ap?'<small>a partir de</small>':''}${money(s.preco)}</span>
+        <button class="add" data-add="${s.id}">Agendar</button>
       </div>
-      <button class="add" data-add="${s.id}">Agendar</button>
     </div></article>`;
 }
 function spy(){
