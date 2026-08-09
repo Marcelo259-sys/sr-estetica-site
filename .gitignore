@@ -1,0 +1,4 @@
+.vercel/
+*.zip
+Thumbs.db
+desktop.ini

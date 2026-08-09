@@ -1,0 +1,23 @@
+{
+  "name": "SR Estética e Bem Estar — Agendamento",
+  "short_name": "SR Estética",
+  "description": "Agende estética facial, corporal, massagens, depilação a laser e cera em 1 minuto.",
+  "start_url": "./?fonte=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FBF7F5",
+  "theme_color": "#9B1226",
+  "lang": "pt-BR",
+  "categories": ["beauty", "health", "lifestyle"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Depilação a laser", "url": "./#cat-laser" },
+    { "name": "Estética facial",   "url": "./#cat-facial" },
+    { "name": "Massagens",         "url": "./#cat-terapias" }
+  ]
+}

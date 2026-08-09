@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SR Estética e Bem Estar — Estética Avançada e Depilação a Laser em Tatuí | Agendamento online</title>
+<meta name="description" content="SR Estética e Bem Estar: há mais de 7 anos no Centro de Tatuí/SP com estética facial, corporal, massagens, depilação a laser e cera. Atendimento personalizado com Simone. Agende online em 1 minuto pelo WhatsApp. Seg a Sex 9h-18h, Sáb 9h-16h.">
+<meta name="theme-color" content="#9B1226">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+
+<!-- Open Graph / WhatsApp preview -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SR Estética e Bem Estar">
+<meta property="og:title" content="SR Estética e Bem Estar — Estética Avançada e Depilação a Laser">
+<meta property="og:description" content="Estética facial, corporal, massagens, depilação a laser e cera no Centro de Tatuí/SP. Agende online em 1 minuto.">
+<meta property="og:url" content="https://SEU-DOMINIO.vercel.app/">
+<meta property="og:image" content="https://SEU-DOMINIO.vercel.app/og.jpg">
+<meta property="og:image:alt" content="SR Estética e Bem Estar — Simone Ribeiro">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* ==========================================================================
+   PALETA / TOKENS  — troque aqui as cores da marca
+   ========================================================================== */
+/* vinho da marca extraído do logo Simone Ribeiro (#96061C) */
+:root{
+  --rose:#9B1226; --rose-d:#6E0A1A; --rose-l:#F8E4E7;
+  --gold:#C9A227; --gold-l:#E7D3A1;
+  --ink:#2B2225; --ink-2:#4A3D40; --muted:#8A787C;
+  --bg:#FBF7F5; --card:#FFFFFF; --line:#EFE1E2;
+  --ok:#2E7D5B; --warn:#9A6414;
+  --r-lg:22px; --r-md:16px; --r-sm:11px;
+  --sh-1:0 1px 2px rgba(43,34,37,.05), 0 6px 18px rgba(43,34,37,.06);
+  --sh-2:0 10px 40px rgba(43,34,37,.16);
+  --maxw:1120px;
+  --safe:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  font-size:15px; line-height:1.55; -webkit-font-smoothing:antialiased;
+  padding-bottom:96px;
+}
+img{max-width:100%;display:block}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+a{color:inherit}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 18px}
+.serif{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;letter-spacing:.2px}
+.eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);font-weight:600}
+
+/* ---------- HERO ---------- */
+header.hero{
+  position:relative;overflow:hidden;
+  background:
+    radial-gradient(120% 90% at 12% 0%, #FFF6F2 0%, rgba(255,246,242,0) 60%),
+    radial-gradient(90% 80% at 100% 10%, #F6E7E5 0%, rgba(246,231,229,0) 55%),
+    linear-gradient(180deg,#FFFDFC 0%, var(--bg) 100%);
+  border-bottom:1px solid var(--line);
+}
+.hero:after{content:"";position:absolute;inset:auto 0 0 0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold-l),transparent)}
+.hero-in{padding:30px 0 26px;text-align:center}
+/* logo da marca */
+h1.brandlogo{margin:0}
+h1.brandlogo img{width:min(68vw,300px);height:auto;margin:0 auto;
+  filter:drop-shadow(0 6px 18px rgba(155,18,38,.14))}
+h1.brandlogo + .eyebrow{margin-top:16px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+  clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.slogan{margin:8px 0 0;color:var(--muted);font-size:14px;letter-spacing:.02em}
+.rule{width:66px;height:1px;margin:16px auto;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.facts{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:4px}
+.fact{display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--line);
+  border-radius:999px;padding:7px 13px;font-size:12.5px;color:var(--ink-2);box-shadow:var(--sh-1)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px rgba(46,125,91,.15)}
+.dot.off{background:#C0554F;box-shadow:0 0 0 3px rgba(192,85,79,.15)}
+.hero-cta{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+.btn{border-radius:999px;padding:11px 20px;font-weight:600;font-size:14px;transition:.18s;border:1px solid transparent}
+.btn-1{background:linear-gradient(140deg,var(--rose),var(--rose-d));color:#fff;box-shadow:0 6px 18px rgba(155,18,38,.3)}
+.btn-1:hover{filter:brightness(1.06)}
+.btn-2{background:#fff;border-color:var(--line);color:var(--ink-2);box-shadow:var(--sh-1)}
+.btn-2:hover{border-color:var(--rose);color:var(--rose-d)}
+.repeat{margin-top:14px}
+.repeat button{background:#FFF8EE;border:1px dashed var(--gold);color:var(--warn);border-radius:999px;
+  padding:10px 18px;font-size:13.5px;font-weight:600}
+
+/* ---------- TABS (sticky + scrollspy) ---------- */
+nav.tabs{position:sticky;top:0;z-index:40;background:rgba(251,247,245,.92);
+  backdrop-filter:saturate(1.4) blur(12px);border-bottom:1px solid var(--line)}
+.tabs-in{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:10px 18px;max-width:var(--maxw);margin:0 auto}
+.tabs-in::-webkit-scrollbar{display:none}
+.tab{white-space:nowrap;border-radius:999px;padding:9px 15px;font-size:13.5px;font-weight:600;
+  color:var(--muted);border:1px solid transparent;transition:.16s}
+.tab:hover{color:var(--rose-d)}
+.tab.on{background:var(--ink);color:#fff;box-shadow:0 4px 14px rgba(43,34,37,.2)}
+
+/* ---------- SEÇÕES / CARDS ---------- */
+section.cat{padding:34px 0 6px;scroll-margin-top:64px}
+.cat-head{display:flex;align-items:baseline;gap:12px;margin-bottom:4px}
+.cat-head h2{margin:0;font-size:clamp(24px,5vw,32px);font-family:"Cormorant Garamond",Georgia,serif;font-weight:600}
+.cat-sub{color:var(--muted);font-size:13.5px;margin:2px 0 18px;max-width:62ch}
+.subhead{display:flex;align-items:center;gap:12px;margin:26px 0 14px;font-size:12px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--gold);font-weight:700}
+.subhead:after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--gold-l),transparent)}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;
+  box-shadow:var(--sh-1);display:flex;flex-direction:column;transition:.2s;position:relative}
+.card:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(43,34,37,.1)}
+.card.on{border-color:var(--rose);box-shadow:0 0 0 2px var(--rose-l),0 10px 28px rgba(155,18,38,.18)}
+.card .thumb{aspect-ratio:1/1;background:var(--rose-l);position:relative}
+.card .thumb img{width:100%;height:100%;object-fit:cover}
+.badge-check{position:absolute;top:10px;right:10px;width:28px;height:28px;border-radius:50%;
+  background:var(--rose);color:#fff;display:none;place-items:center;font-size:15px;
+  box-shadow:0 4px 12px rgba(155,18,38,.45)}
+.card.on .badge-check{display:grid}
+.card-b{padding:14px 15px 15px;display:flex;flex-direction:column;gap:7px;flex:1}
+.card-b h3{margin:0;font-size:15.5px;font-weight:600;line-height:1.3}
+.card-b p{margin:0;font-size:12.8px;color:var(--muted);line-height:1.45;flex:1}
+.meta{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:2px}
+.dur{font-size:12.5px;color:var(--ink-2);background:#F8F2F1;border-radius:999px;padding:4px 10px}
+.price{font-family:"Cormorant Garamond",serif;font-size:22px;font-weight:700;color:var(--rose-d)}
+.price small{font-family:Inter,sans-serif;font-size:10.5px;font-weight:600;color:var(--muted);display:block;line-height:1}
+.add{width:100%;margin-top:4px;border-radius:12px;padding:10px;font-size:13.5px;font-weight:600;
+  border:1px solid var(--line);background:#FCF8F7;color:var(--ink-2);transition:.16s}
+.add:hover{border-color:var(--rose);color:var(--rose-d)}
+.card.on .add{background:var(--rose);border-color:var(--rose);color:#fff}
+
+/* ---------- SOBRE / EQUIPE / FOOTER ---------- */
+.about{margin:44px 0 10px;background:linear-gradient(140deg,#fff,#FFFAF8);border:1px solid var(--line);
+  border-radius:var(--r-lg);padding:28px 22px;box-shadow:var(--sh-1)}
+.about-foto{width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:var(--r-md);
+  margin-bottom:20px;box-shadow:var(--sh-1)}
+.about h2{margin:6px 0 10px;font-size:clamp(22px,5vw,30px);font-family:"Cormorant Garamond",serif;font-weight:600}
+.about p{margin:0 0 14px;color:var(--ink-2);font-size:14.5px;line-height:1.65;max-width:70ch}
+.about p strong{color:var(--ink);font-weight:600}
+.about-quote{margin:22px 0 0;padding:16px 0 4px 20px;border-left:2px solid var(--gold);
+  font-family:"Cormorant Garamond",Georgia,serif;font-size:22px;line-height:1.4;
+  color:var(--rose-d);max-width:60ch;font-weight:600}
+.team{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));margin-top:20px}
+.team.solo{grid-template-columns:1fr;max-width:430px}
+.team.solo{max-width:470px}
+.team.solo .tcard{border-color:var(--gold-l);background:linear-gradient(135deg,#fff,#FFFBF2);padding:16px;gap:16px}
+.team.solo .tav{width:52px;height:52px;font-size:24px}
+.tav-foto{width:98px;height:98px;border-radius:16px;object-fit:cover;object-position:50% 18%;
+  flex:0 0 auto;background:#fff;box-shadow:0 6px 18px rgba(110,10,26,.14),0 0 0 1px rgba(201,162,39,.4)}
+.team.solo .tcard b{font-size:19px;font-family:"Cormorant Garamond",serif;font-weight:600}
+.team.solo .tcard span{font-size:12.5px;line-height:1.4;display:block;margin-top:3px}
+.tcard{background:#fff;border:1px solid var(--line);border-radius:var(--r-md);padding:14px;display:flex;gap:11px;align-items:center}
+.tav{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;color:#fff;flex:0 0 auto;
+  font-family:"Cormorant Garamond",serif;font-size:19px;background:linear-gradient(140deg,var(--rose),var(--rose-d))}
+.tcard b{font-size:14px;font-weight:600;display:block}
+.tcard span{font-size:12px;color:var(--muted)}
+footer{margin-top:38px;border-top:1px solid var(--line);background:#fff}
+.foot-in{padding:26px 0 30px;display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.foot-in h4{margin:0 0 7px;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+.foot-in p{margin:0;font-size:13.5px;color:var(--ink-2)}
+.copy{border-top:1px solid var(--line);padding:14px 0;font-size:12px;color:var(--muted);text-align:center}
+
+/* ---------- BARRA FLUTUANTE ---------- */
+.floatbar{position:fixed;left:0;right:0;bottom:0;z-index:60;padding:10px 14px calc(10px + var(--safe));
+  background:linear-gradient(180deg,rgba(251,247,245,0),rgba(251,247,245,.96) 34%);
+  transform:translateY(130%);transition:transform .28s cubic-bezier(.2,.9,.3,1)}
+.floatbar.show{transform:none}
+.fb{max-width:640px;margin:0 auto;display:flex;align-items:center;gap:12px;
+  background:var(--ink);color:#fff;border-radius:999px;padding:11px 12px 11px 20px;box-shadow:var(--sh-2)}
+.fb .l{flex:1;min-width:0}
+.fb .l b{display:block;font-size:14px;font-weight:600}
+.fb .l span{font-size:11.5px;opacity:.7}
+.fb .go{background:linear-gradient(140deg,var(--rose),var(--rose-d));border-radius:999px;padding:11px 20px;
+  font-weight:600;font-size:14px;color:#fff;white-space:nowrap}
+
+/* ---------- BOTTOM SHEET (checkout) ---------- */
+.sheet{position:fixed;inset:0;z-index:90;display:none}
+.sheet.open{display:block}
+.sh-bg{position:absolute;inset:0;background:rgba(43,34,37,.5);backdrop-filter:blur(3px);animation:fade .2s}
+@keyframes fade{from{opacity:0}}
+.sh-card{
+  position:absolute;left:0;right:0;bottom:0;margin:0 auto;max-width:560px;
+  background:var(--bg);border-radius:24px 24px 0 0;box-shadow:var(--sh-2);
+  /* ---- LAYOUT CRÍTICO: coluna flex com altura limitada ---- */
+  display:flex;flex-direction:column;
+  max-height:94vh;max-height:94dvh;
+  animation:up .3s cubic-bezier(.2,.9,.3,1);overflow:hidden;
+}
+@keyframes up{from{transform:translateY(100%)}}
+.sh-head{flex:0 0 auto;padding:14px 18px 10px;border-bottom:1px solid var(--line);background:#fff;
+  border-radius:24px 24px 0 0;position:relative}
+.grab{width:38px;height:4px;border-radius:99px;background:var(--line);margin:0 auto 10px}
+.sh-head h3{margin:0;font-size:19px;font-family:"Cormorant Garamond",serif;font-weight:600}
+.sh-close{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:50%;
+  background:#F6EFEE;color:var(--muted);display:grid;place-items:center;font-size:16px}
+/* itens escolhidos: rolam, ocupam no máximo 34vh */
+.sh-body{flex:0 1 auto;min-height:0;overflow-y:auto;max-height:34vh;padding:10px 18px;
+  -webkit-overflow-scrolling:touch}
+/* formulário: cresce e rola */
+.sh-foot{flex:1 1 auto;min-height:0;overflow-y:auto;padding:2px 18px 0;-webkit-overflow-scrolling:touch}
+
+.line{display:flex;gap:11px;align-items:center;padding:9px 0;border-bottom:1px dashed var(--line)}
+.line:last-child{border-bottom:0}
+.line img{width:44px;height:44px;border-radius:10px;object-fit:cover;flex:0 0 auto}
+.line .t{flex:1;min-width:0}
+.line .t b{display:block;font-size:13.8px;font-weight:600}
+.line .t span{font-size:11.5px;color:var(--muted)}
+.line .p{font-size:13.5px;font-weight:600;color:var(--rose-d);white-space:nowrap}
+.rm{width:26px;height:26px;border-radius:50%;background:#F6EFEE;color:var(--muted);display:grid;place-items:center;font-size:15px;flex:0 0 auto}
+.rm:hover{background:#F7E2E2;color:#B3453D}
+
+.block{margin:16px 0 0}
+.block > label,.blabel{display:block;font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--gold);font-weight:700;margin-bottom:8px}
+.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;border:1px solid var(--line);background:#fff;border-radius:14px;padding:9px 13px;
+  font-size:13px;color:var(--ink-2);transition:.15s;text-align:center;line-height:1.25}
+.chip:hover{border-color:var(--rose)}
+.chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.chip .d{display:block;font-size:10.5px;opacity:.7;letter-spacing:.08em;text-transform:uppercase}
+.chip .n{display:block;font-size:16px;font-weight:700;font-family:"Cormorant Garamond",serif}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(74px,1fr));gap:8px}
+.slot{border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 4px;font-size:13.5px;font-weight:600;color:var(--ink-2)}
+.slot:hover{border-color:var(--rose)}
+.slot.on{background:var(--rose);border-color:var(--rose);color:#fff}
+.profs{display:flex;gap:8px;flex-wrap:wrap}
+.prof{border:1px solid var(--line);background:#fff;border-radius:14px;padding:8px 12px;font-size:13px;text-align:left}
+.prof b{display:block;font-weight:600}
+.prof span{font-size:10.5px;color:var(--muted)}
+.prof.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.prof.on span{color:rgba(255,255,255,.7)}
+input[type=text],input[type=tel]{width:100%;border:1px solid var(--line);background:#fff;border-radius:12px;
+  padding:12px 13px;font-size:15px;color:var(--ink);outline:0;transition:.15s}
+input:focus{border-color:var(--rose);box-shadow:0 0 0 3px var(--rose-l)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cupom-row{display:flex;gap:8px}
+.cupom-row input{flex:1;text-transform:uppercase}
+.cupom-row button{border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:12px;padding:0 16px;font-size:13.5px;font-weight:600}
+.hintok{font-size:12px;color:var(--ok);margin-top:6px}
+.hinterr{font-size:12px;color:#B3453D;margin-top:6px}
+
+/* cross-sell */
+.xsell{background:linear-gradient(140deg,#FFF9F1,#FFF4F4);border:1px solid var(--gold-l);
+  border-radius:var(--r-md);padding:13px 14px;margin-top:16px}
+.xsell .blabel{color:var(--warn)}
+.xchips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.xchips::-webkit-scrollbar{display:none}
+.xchip{flex:0 0 auto;background:#fff;border:1px solid var(--gold-l);border-radius:999px;padding:8px 13px;
+  font-size:12.8px;color:var(--ink-2);white-space:nowrap}
+.xchip:hover{background:var(--gold);border-color:var(--gold);color:#fff}
+.xchip b{color:var(--rose-d);font-weight:700}
+.xchip:hover b{color:#fff}
+
+/* resumo */
+.sum{background:#fff;border:1px solid var(--line);border-radius:var(--r-md);padding:13px 14px;margin-top:16px}
+.sum div{display:flex;justify-content:space-between;font-size:13.5px;color:var(--ink-2);padding:3px 0}
+.sum .tot{border-top:1px solid var(--line);margin-top:7px;padding-top:9px;font-size:17px;font-weight:700;color:var(--ink)}
+.sum .tot span:last-child{font-family:"Cormorant Garamond",serif;font-size:24px;color:var(--rose-d)}
+.sum .disc{color:var(--ok)}
+.note{font-size:11.8px;color:var(--muted);margin-top:10px;line-height:1.45}
+
+/* botão de envio: sempre visível */
+.sh-send{position:sticky;bottom:0;padding:12px 0 calc(14px + var(--safe));margin-top:14px;
+  background:linear-gradient(180deg,rgba(251,247,245,0),var(--bg) 26%)}
+.send{width:100%;border-radius:16px;padding:15px;font-size:15.5px;font-weight:700;color:#fff;
+  background:linear-gradient(140deg,#25b34c,#12833a);box-shadow:0 8px 22px rgba(18,131,58,.3)}
+.send[disabled]{background:#CFC5C6;box-shadow:none;cursor:not-allowed}
+.warnbar{background:#FFF6E6;border:1px solid var(--gold-l);color:var(--warn);border-radius:12px;
+  padding:9px 12px;font-size:12.5px;margin-top:12px}
+
+/* PWA install bar (só mobile) */
+.pwa{position:fixed;left:12px;right:12px;bottom:calc(78px + var(--safe));z-index:70;display:none;
+  background:var(--ink);color:#fff;border-radius:16px;padding:11px 13px;align-items:center;gap:11px;box-shadow:var(--sh-2)}
+.pwa.show{display:flex}
+.pwa p{margin:0;flex:1;font-size:12.8px;line-height:1.35}
+.pwa .yes{background:var(--rose);border-radius:999px;padding:8px 14px;font-size:12.8px;font-weight:600}
+.pwa .no{opacity:.55;font-size:18px;padding:0 4px}
+
+.empty{text-align:center;color:var(--muted);font-size:13.5px;padding:20px 0}
+@media (min-width:760px){
+  body{font-size:15.5px}
+  .hero-in{padding:48px 0 40px}
+  .sh-card{border-radius:24px;bottom:16px;left:16px;right:16px}
+}
+</style>
+</head>
+<body>
+
+<!-- =========================== HERO =========================== -->
+<header class="hero">
+  <div class="wrap hero-in">
+    <h1 class="brandlogo">
+      <img src="logo.png" alt="SR Estética e Bem Estar — Simone Ribeiro" width="900" height="727" fetchpriority="high">
+      <span class="sr-only" id="hName">SR Estética e Bem Estar</span>
+    </h1>
+    <div class="eyebrow" id="eyebrow">Há mais de 7 anos em Tatuí</div>
+    <p class="slogan" id="hSlogan">estética avançada, laser & autocuidado</p>
+    <div class="rule"></div>
+    <div class="facts">
+      <span class="fact"><span class="dot" id="stDot"></span><span id="stTxt">Aberto agora</span></span>
+      <span class="fact">Mais de 7 anos de experiência</span>
+      <span class="fact" id="fHour">Seg a Sex 9h–18h · Sáb 9h–16h</span>
+      <span class="fact" id="fAddr">Endereço</span>
+    </div>
+    <div class="hero-cta">
+      <button class="btn btn-1" onclick="document.getElementById('cat-facial').scrollIntoView({behavior:'smooth'})">Ver procedimentos</button>
+      <button class="btn btn-2" id="btnMaps">Como chegar</button>
+    </div>
+    <div class="repeat" id="repeatWrap" hidden>
+      <button id="btnRepeat">🔁 Repetir últimos serviços</button>
+    </div>
+  </div>
+</header>
+
+<!-- =========================== TABS =========================== -->
+<nav class="tabs"><div class="tabs-in" id="tabs"></div></nav>
+
+<main class="wrap" id="catalog"></main>
+
+<!-- =========================== SOBRE =========================== -->
+<div class="wrap">
+  <div class="about">
+    <img class="about-foto" src="fotos/ambiente.jpg" alt="Sala de atendimento da SR Estética e Bem Estar"
+         loading="lazy" onerror="this.remove()">
+    <div class="eyebrow">Sobre</div>
+    <h2>Quem cuida de você</h2>
+    <p>Simone Ribeiro começou na estética por um motivo simples: gostava de ver a mudança no rosto de alguém
+      que se olha no espelho e gosta do que vê. Mais de sete anos depois, é isso que continua movendo o trabalho
+      dela na SR Estética e Bem Estar, no Largo do Mercado, em Tatuí.</p>
+
+    <!-- ======================================================================
+         AQUI ENTRA A FORMAÇÃO. Descomente e preencha com os dados reais:
+
+    <p>Formada em Estética e Cosmetologia pela INSTITUIÇÃO (ANO), mantém formação
+       continuada em CURSOS E ESPECIALIZAÇÕES, acompanhando de perto a evolução dos
+       equipamentos e dos ativos que usa no dia a dia.</p>
+
+         Não publique com dados inventados: afirmação de qualificação profissional
+         que não confere é propaganda enganosa.
+         ====================================================================== -->
+
+    <p>O atendimento na SR tem uma característica que a diferencia de clínicas maiores:
+      <strong>é sempre a mesma profissional do começo ao fim</strong>. Simone recebe, avalia, executa o
+      procedimento e acompanha o resultado. Isso significa que ninguém precisa recontar o histórico a cada
+      visita, e que qualquer ajuste de protocolo é feito por quem já conhece a pele daquela cliente.</p>
+
+    <p>A avaliação prévia é obrigatória em todos os procedimentos — não por formalidade, mas porque tipo de
+      pele, fototipo, rotina e histórico mudam completamente a indicação. Uma limpeza de pele para pele oleosa
+      e acneica não é a mesma para pele madura e sensibilizada.</p>
+
+    <p>O espaço é reservado, com material descartável e privacidade total, especialmente nos procedimentos
+      íntimos. E o acompanhamento não termina quando a cliente sai: orientação de pós-procedimento e retorno
+      fazem parte do serviço.</p>
+
+    <blockquote class="about-quote">Cada procedimento com atenção, carinho e dedicação —
+      do primeiro contato ao pós-atendimento.</blockquote>
+
+    <div class="team" id="team"></div>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap foot-in">
+    <div><h4>Endereço</h4><p id="fAddr2">—</p></div>
+    <div><h4>Horários</h4><p>Segunda a sexta: 9h às 18h<br>Sábado: 9h às 16h<br>Domingo: fechado<br><em>Feriados: horários diferenciados</em></p></div>
+    <div><h4>Contato</h4><p id="fPhone">—</p></div>
+  </div>
+  <div class="copy">© <span id="yr"></span> <span id="fName">Clínica</span> · Agendamento online</div>
+</footer>
+
+<!-- =========================== FLOATING BAR =========================== -->
+<div class="floatbar" id="floatbar">
+  <div class="fb">
+    <div class="l"><b id="fbCount">0 serviços</b><span id="fbDur">—</span></div>
+    <button class="go" id="fbGo">Agendar · <span id="fbTotal">R$ 0,00</span></button>
+  </div>
+</div>
+
+<!-- =========================== PWA BAR =========================== -->
+<div class="pwa" id="pwaBar">
+  <p><b>Instale no seu celular</b><br>agende em 1 toque, sem abrir o navegador.</p>
+  <button class="yes" id="pwaYes">Instalar</button>
+  <button class="no" id="pwaNo">×</button>
+</div>
+
+<!-- =========================== SHEET =========================== -->
+<div class="sheet" id="sheet" aria-hidden="true">
+  <div class="sh-bg" id="shBg"></div>
+  <div class="sh-card" role="dialog" aria-modal="true" aria-label="Seu agendamento">
+    <div class="sh-head">
+      <div class="grab"></div>
+      <h3>Seu agendamento</h3>
+      <button class="sh-close" id="shClose" aria-label="Fechar">×</button>
+    </div>
+
+    <!-- itens escolhidos (rola) -->
+    <div class="sh-body" id="shBody"></div>
+
+    <!-- formulário (cresce e rola) -->
+    <div class="sh-foot">
+      <div class="xsell" id="xsell" hidden>
+        <div class="blabel" id="xlabel">Aproveite e agende também</div>
+        <div class="xchips" id="xchips"></div>
+      </div>
+
+      <div class="block">
+        <div class="blabel">Escolha o dia</div>
+        <div class="chips" id="days"></div>
+      </div>
+
+      <div class="block">
+        <div class="blabel">Escolha o horário</div>
+        <div class="slots" id="slots"></div>
+        <div class="note" id="slotNote"></div>
+      </div>
+
+      <div class="block" id="profBlock">
+        <div class="blabel">Profissional</div>
+        <div class="profs" id="profs"></div>
+        <div class="note" id="profNote"></div>
+      </div>
+
+      <div class="block">
+        <div class="blabel">Seus dados</div>
+        <div class="two">
+          <input type="text" id="cName" placeholder="Seu nome" autocomplete="name">
+          <input type="tel" id="cPhone" placeholder="WhatsApp (DDD)" inputmode="numeric" autocomplete="tel">
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="blabel">Cupom de desconto</div>
+        <div class="cupom-row">
+          <input type="text" id="cCoupon" placeholder="Ex.: ESTETICA" autocapitalize="characters" autocomplete="off">
+          <button id="btnCoupon">Aplicar</button>
+        </div>
+        <div id="couponMsg"></div>
+        <div class="note" id="couponHint"></div>
+      </div>
+
+      <div class="sum" id="sum"></div>
+      <div class="warnbar" id="closedWarn" hidden></div>
+      <div class="note">Feriados têm horários diferenciados — confirmamos sua vaga pelo WhatsApp. Chegue 10 min antes.</div>
+
+      <div class="sh-send">
+        <button class="send" id="btnSend">Enviar pelo WhatsApp</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =========================== JSON-LD =========================== -->
+<script type="application/ld+json" id="ldjson"></script>
+
+<script>
+/* ============================================================================
+   1) CONFIGURAÇÃO — TROQUE AQUI (só este bloco)
+   ========================================================================== */
+const CONFIG = {
+  nome:      "SR Estética e Bem Estar",       // <-- nome da clínica (usado na msg do WhatsApp e no SEO)
+  logo:      "logo.png",                      // <-- arquivo do logo (fundo transparente)
+  slogan:    "estética avançada, laser & autocuidado",
+  whatsapp:  "5515997133089",                 // <-- 55 + DDD + número, só dígitos
+  telefoneExibicao: "(15) 99713-3089",
+  endereco:  "Largo do Mercado, 19 — Sala 2, Centro, Tatuí/SP, 18270-353",
+  logradouro:"Largo do Mercado, 19 — Sala 2", bairro:"Centro",
+  cidade:    "Tatuí", uf:"SP", cep:"18270-353",
+  // link do botão "Como chegar" — deixe "" que eu monto pelo endereço
+  mapsUrl:   "https://www.google.com/maps/search/?api=1&query=SR%20Est%C3%A9tica%20e%20Bem%20Estar%2C%20Largo%20do%20Mercado%2C%2019%20-%20Centro%2C%20Tatu%C3%AD%20-%20SP%2C%2018270-353",
+  // horários por dia da semana (0=Dom … 6=Sáb). null = fechado
+  horarios: {0:null, 1:["09:00","18:00"], 2:["09:00","18:00"], 3:["09:00","18:00"],
+             4:["09:00","18:00"], 5:["09:00","18:00"], 6:["09:00","16:00"]},
+  // feriados sem atendimento normal (AAAA-MM-DD) — horário diferenciado, confirmar no zap
+  feriados: ["2026-09-07","2026-10-12","2026-11-02","2026-11-15","2026-11-20","2026-12-25","2027-01-01"],
+  slotMin: 30,          // intervalo entre horários
+  antecedenciaMin: 60,  // não oferecer horário nos próximos X minutos de hoje
+  /* CUPONS — o código é comparado sem acento e em maiúsculas,
+     então "estética", "Estetica" e "ESTÉTICA" funcionam igual.
+     tipo: "percent" (valor em %) ou "fixo" (valor em R$)
+     minItens: quantidade mínima de procedimentos no mesmo agendamento
+     minimo: valor mínimo em R$ | cats: limita a certas categorias        */
+  cupons: {
+    "ESTETICA": {tipo:"percent", valor:10, desc:"2 ou mais procedimentos", minItens:2}
+  },
+  cupomDestaque: "ESTETICA"  // aparece como sugestão no agendamento
+};
+
+/* ---- EQUIPE (multiprofissional). cats = categorias que a profissional atende ---- */
+/* Hoje a Simone atende sozinha. Se um dia entrar mais alguém, é só acrescentar aqui
+   ({id, nome, papel, cats}) — o passo "Profissional" reaparece sozinho no agendamento. */
+const PROFS = [
+  {id:"simone", nome:"Simone", papel:"Esteticista responsável · +7 anos de experiência",
+   foto:"fotos/simone.jpg",   // sem foto, o card mostra a inicial num círculo
+   cats:["facial","corporal","terapias","laser","cera"]}
+];
+
+/* ---- CATEGORIAS ---- */
+const CATS = [
+  {id:"facial",   nome:"Estética Facial",     tab:"Facial",   sub:"Limpezas, peelings, microagulhamento e protocolos de rejuvenescimento com avaliação individual."},
+  {id:"corporal", nome:"Estética Corporal",   tab:"Corporal", sub:"Drenagem, modelagem, clareamentos e tratamentos dermatofuncionais para pele e contorno."},
+  {id:"terapias", nome:"Massagens & Terapias",tab:"Massagens",sub:"Relaxamento, ventosaterapia, pedras quentes e terapias integrativas."},
+  {id:"laser",    nome:"Depilação a Laser",   tab:"Laser",    sub:"Tecnologia de alta potência, sessões rápidas e resultado progressivo. Protocolos femininos e masculinos."},
+  {id:"cera",     nome:"Depilação a Cera",    tab:"Cera",     sub:"Cera quente e roll-on descartável, aplicada por profissional especializada."}
+];
+
+/* ---- SERVIÇOS ----
+   min = duração em minutos | preco = R$ | ap = "a partir de" | foto = "" (troque pela URL da sua foto quadrada)
+*/
+const SERVICES = [
+/* ---------------- FACIAL ---------------- */
+{id:"limpeza-de-pele-premium",cat:"facial",nome:"Limpeza de pele Premium",min:60,preco:150,desc:"Higienização profunda, extração, alta frequência e máscara calmante.",foto:""},
+{id:"limpeza-de-pele-glow",cat:"facial",nome:"Limpeza de pele Glow",min:90,preco:200,desc:"Limpeza completa com ativos iluminadores e finalização de brilho imediato.",foto:""},
+{id:"peeling",cat:"facial",nome:"Peeling",min:60,preco:150,desc:"Renovação celular para manchas, textura irregular e falta de viço.",foto:""},
+{id:"microagulhamento",cat:"facial",nome:"Microagulhamento",min:60,preco:250,ap:true,desc:"Indução de colágeno para cicatrizes, poros e flacidez. Valor conforme área.",foto:""},
+{id:"microagulhamento-sem-agulhas",cat:"facial",nome:"Microagulhamento sem agulhas",min:60,preco:150,desc:"Permeação de ativos sem downtime, indolor e sem descamação.",foto:""},
+{id:"revitalizacao-facial",cat:"facial",nome:"Revitalização facial",min:40,preco:80,desc:"Hidratação intensa e nutrição para pele cansada. Ótimo antes de eventos.",foto:""},
+{id:"tratamento-rejuvenescimento",cat:"facial",nome:"Tratamento Rejuvenescimento",min:60,preco:100,desc:"Firmeza e linhas finas: protocolo com ativos tensores e estímulo de colágeno.",foto:""},
+{id:"tratamento-rosacea",cat:"facial",nome:"Tratamento Rosácea",min:60,preco:90,desc:"Controle de vermelhidão e sensibilidade com ativos calmantes.",foto:""},
+{id:"tratamento-acne",cat:"facial",nome:"Tratamento Acne",min:60,preco:90,desc:"Controle de oleosidade, extração cuidadosa e ação anti-inflamatória.",foto:""},
+{id:"hydra-gloss-lips",cat:"facial",nome:"Hydra Gloss Lips",min:50,preco:100,desc:"Hidratação profunda dos lábios com efeito volumizado e brilho natural.",foto:""},
+{id:"rinomodelagem",cat:"facial",nome:"Rinomodelagem",min:60,preco:200,desc:"Harmonização do nariz sem cirurgia, com avaliação prévia.",foto:"",profs:["bella"]},
+
+/* ---------------- CORPORAL ---------------- */
+{id:"drenagem-linfatica",cat:"corporal",nome:"Drenagem linfática",min:60,preco:110,desc:"Manobras que reduzem retenção de líquido, inchaço e sensação de peso.",foto:""},
+{id:"detox-corporal",cat:"corporal",nome:"Detox corporal",min:60,preco:100,desc:"Esfoliação, ativos drenantes e bandagem para desintoxicar e desinchar.",foto:""},
+{id:"esfoliacao-corporal",cat:"corporal",nome:"Esfoliação corporal",min:60,preco:80,desc:"Remove células mortas e deixa a pele lisa, uniforme e preparada.",foto:""},
+{id:"banho-de-lua-bracos",cat:"corporal",nome:"Banho de lua (braços)",min:45,preco:60,desc:"Esfoliação, clareamento dos pelos e hidratação dos braços.",foto:""},
+{id:"banho-de-lua-pernas",cat:"corporal",nome:"Banho de lua (pernas)",min:60,preco:95,desc:"Pernas mais claras, macias e uniformes com efeito imediato.",foto:""},
+{id:"banho-de-lua-completo",cat:"corporal",nome:"Banho de lua (braços e pernas)",min:100,preco:140,desc:"Protocolo completo de clareamento e hidratação. Melhor custo-benefício.",foto:""},
+{id:"gessoterapia",cat:"corporal",nome:"Gessoterapia",min:60,preco:120,desc:"Bandagem com efeito térmico para contorno corporal e medidas.",foto:""},
+{id:"liporedux",cat:"corporal",nome:"Liporedux",min:45,preco:70,desc:"Protocolo redutor localizado com ativos lipolíticos.",foto:""},
+{id:"massagem-modeladora",cat:"corporal",nome:"Massagem modeladora",min:60,preco:130,desc:"Manobras vigorosas para gordura localizada e contorno corporal.",foto:""},
+{id:"aplicacao-de-enzimas",cat:"corporal",nome:"Aplicação de enzimas",min:60,preco:150,ap:true,desc:"Enzimas para gordura localizada e flacidez. Valor conforme área e protocolo.",foto:"",profs:["bella"]},
+{id:"secagem-de-vasinhos",cat:"corporal",nome:"Secagem de vasinhos",min:60,preco:130,ap:true,desc:"Tratamento de microvasos nas pernas. Valor conforme extensão da área.",foto:"",profs:["bella"]},
+{id:"clareamento-axilas",cat:"corporal",nome:"Clareamento de axilas",min:40,preco:70,desc:"Uniformiza o tom das axilas com ativos clareadores seguros.",foto:""},
+{id:"clareamento-intimo",cat:"corporal",nome:"Clareamento íntimo",min:40,preco:80,desc:"Clareamento da região íntima com produtos específicos e sigilo total.",foto:""},
+{id:"tratamento-foliculite",cat:"corporal",nome:"Tratamento de foliculite",min:40,preco:80,desc:"Reduz pelos encravados, vermelhidão e inflamação após a depilação.",foto:""},
+{id:"manchas-solares-maos",cat:"corporal",nome:"Tratamento de manchas solares (mãos)",min:30,preco:80,desc:"Clareamento das manchas de sol no dorso das mãos.",foto:""},
+
+/* ---------------- MASSAGENS & TERAPIAS ---------------- */
+{id:"massagem-relaxante-60",cat:"terapias",nome:"Massagem relaxante (1h)",min:60,preco:100,desc:"Alivia tensão, estresse e dores musculares. Óleos aromáticos inclusos.",foto:""},
+{id:"massagem-relaxante-30",cat:"terapias",nome:"Massagem relaxante (30min)",min:30,preco:55,desc:"Sessão express focada em pescoço, ombros e costas.",foto:""},
+{id:"pedras-quentes",cat:"terapias",nome:"Pedras quentes",min:60,preco:120,desc:"Calor terapêutico que relaxa profundamente a musculatura.",foto:""},
+{id:"ventosaterapia",cat:"terapias",nome:"Ventosaterapia",min:50,preco:100,desc:"Ventosas para circulação, dores nas costas e liberação miofascial.",foto:""},
+{id:"relaxante-e-ventosa",cat:"terapias",nome:"Relaxante + ventosaterapia",min:60,preco:120,desc:"O melhor dos dois: massagem relaxante combinada com ventosas.",foto:""},
+{id:"escalda-pes",cat:"terapias",nome:"Escalda pés com massagem",min:40,preco:65,desc:"Imersão aromática quente com massagem nos pés. Puro descanso.",foto:""},
+{id:"acupuntura-auricular",cat:"terapias",nome:"Acupuntura auricular",min:30,preco:60,desc:"Pontos auriculares para ansiedade, sono, compulsão alimentar e dores.",foto:""},
+
+/* ---------------- LASER — FEMININO ---------------- */
+{id:"laser-buco",cat:"laser",sub:"Feminina",nome:"Laser buço",min:20,preco:50,desc:"Sessão rápida e praticamente indolor no buço.",foto:""},
+{id:"laser-queixo-buco",cat:"laser",sub:"Feminina",nome:"Laser queixo + buço",min:30,preco:85,desc:"Combo de face inferior com economia na sessão.",foto:""},
+{id:"laser-axilas",cat:"laser",sub:"Feminina",nome:"Laser axilas",min:25,preco:80,desc:"Adeus lâmina: pele lisa e sem manchas por atrito.",foto:""},
+{id:"laser-faixa-umbigo",cat:"laser",sub:"Feminina",nome:"Laser faixa do umbigo",min:15,preco:25,desc:"Linha alba tratada em poucos minutos.",foto:""},
+{id:"laser-gluteos",cat:"laser",sub:"Feminina",nome:"Laser glúteos",min:25,preco:70,desc:"Remoção dos pelos da região glútea com conforto.",foto:""},
+{id:"laser-perianal",cat:"laser",sub:"Feminina",nome:"Laser perianal",min:25,preco:60,desc:"Higiene e conforto, com total privacidade.",foto:""},
+{id:"laser-virilha-simples",cat:"laser",sub:"Feminina",nome:"Laser virilha simples",min:25,preco:140,desc:"Contorno da linha do biquíni.",foto:""},
+{id:"laser-virilha-cavada",cat:"laser",sub:"Feminina",nome:"Laser virilha cavada",min:30,preco:150,desc:"Vai além da linha do biquíni, mantendo o centro.",foto:""},
+{id:"laser-virilha-completa",cat:"laser",sub:"Feminina",nome:"Laser virilha completa",min:30,preco:160,desc:"Remoção total da região íntima.",foto:""},
+{id:"laser-meia-perna",cat:"laser",sub:"Feminina",nome:"Laser meia perna",min:30,preco:100,desc:"Do joelho ao tornozelo, sessão confortável.",foto:""},
+{id:"laser-perna-inteira",cat:"laser",sub:"Feminina",nome:"Laser perna inteira",min:40,preco:200,desc:"Pernas completas, resultado progressivo sessão a sessão.",foto:""},
+{id:"laser-bracos",cat:"laser",sub:"Feminina",nome:"Laser braços",min:30,preco:130,desc:"Braços completos, sem irritação e sem encravados.",foto:""},
+{id:"laser-combo-axila-buco",cat:"laser",sub:"Feminina",nome:"Combo laser axila + buço",min:25,preco:110,desc:"Duas áreas na mesma sessão com desconto.",foto:""},
+{id:"laser-combo-virilha-axila",cat:"laser",sub:"Feminina",nome:"Combo laser virilha + axila",min:40,preco:220,desc:"As duas áreas mais pedidas, juntas e mais em conta.",foto:""},
+{id:"laser-combo-virilha-axila-meia-perna",cat:"laser",sub:"Feminina",nome:"Combo laser virilha + axila + meia perna",min:60,preco:330,desc:"Combo campeão de vendas: economia real por sessão.",foto:""},
+
+/* ---------------- LASER — MASCULINO ---------------- */
+{id:"laser-masc-barba",cat:"laser",sub:"Masculina",nome:"Laser masculina barba",min:25,preco:140,desc:"Desenho de barba e fim da foliculite no pescoço.",foto:""},
+{id:"laser-masc-axilas",cat:"laser",sub:"Masculina",nome:"Laser masculina axilas",min:25,preco:90,desc:"Menos suor aparente e mais conforto no dia a dia.",foto:""},
+{id:"laser-masc-peito",cat:"laser",sub:"Masculina",nome:"Laser masculina peito",min:25,preco:110,desc:"Redução ou remoção total dos pelos do tórax.",foto:""},
+{id:"laser-masc-abdomen",cat:"laser",sub:"Masculina",nome:"Laser masculina abdômen",min:30,preco:110,desc:"Abdômen definido sem lâmina nem irritação.",foto:""},
+{id:"laser-masc-costas",cat:"laser",sub:"Masculina",nome:"Laser masculina costas",min:30,preco:180,desc:"Área ampla resolvida em uma sessão rápida.",foto:""},
+{id:"laser-masc-bracos",cat:"laser",sub:"Masculina",nome:"Laser masculina braços",min:30,preco:160,desc:"Redução de volume de pelos com naturalidade.",foto:""},
+{id:"laser-masc-meia-perna",cat:"laser",sub:"Masculina",nome:"Laser masculina meia perna",min:25,preco:130,desc:"Ideal para quem pratica esportes e ciclismo.",foto:""},
+{id:"laser-masc-perna-inteira",cat:"laser",sub:"Masculina",nome:"Laser masculina perna inteira",min:30,preco:230,desc:"Pernas completas com aplicador de alta cobertura.",foto:""},
+
+/* ---------------- CERA — FEMININO ---------------- */
+{id:"cera-buco",cat:"cera",sub:"Feminina",nome:"Cera buço",min:20,preco:30,desc:"Cera quente com finalização calmante.",foto:""},
+{id:"cera-rosto",cat:"cera",sub:"Feminina",nome:"Cera rosto",min:40,preco:50,desc:"Buço, queixo e laterais do rosto.",foto:""},
+{id:"cera-nariz-orelha",cat:"cera",sub:"Feminina",nome:"Cera nariz ou orelha",min:20,preco:30,desc:"Remoção rápida e segura com cera específica.",foto:""},
+{id:"cera-axilas",cat:"cera",sub:"Feminina",nome:"Cera axilas",min:30,preco:40,desc:"Cera quente, menos dor e menos encravados.",foto:""},
+{id:"cera-bracos",cat:"cera",sub:"Feminina",nome:"Cera braços",min:60,preco:90,desc:"Braços completos com hidratação pós-depilação.",foto:""},
+{id:"cera-faixa-umbigo",cat:"cera",sub:"Feminina",nome:"Cera faixa de umbigo",min:20,preco:20,desc:"Linha do umbigo, rapidinho.",foto:""},
+{id:"cera-meia-perna",cat:"cera",sub:"Feminina",nome:"Cera meia perna",min:40,preco:65,desc:"Do joelho ao pé, pele lisa por semanas.",foto:""},
+{id:"cera-perna-inteira",cat:"cera",sub:"Feminina",nome:"Cera perna inteira",min:60,preco:110,desc:"Pernas completas com cera quente premium.",foto:""},
+{id:"cera-virilha-simples",cat:"cera",sub:"Feminina",nome:"Cera virilha simples",min:40,preco:65,desc:"Contorno da linha do biquíni.",foto:""},
+{id:"cera-virilha-cavada",cat:"cera",sub:"Feminina",nome:"Cera virilha cavada",min:45,preco:80,desc:"Cavada, mantendo o centro.",foto:""},
+{id:"cera-virilha-completa",cat:"cera",sub:"Feminina",nome:"Cera virilha completa",min:60,preco:90,desc:"Remoção total, com cera de baixa temperatura.",foto:""},
+{id:"cera-gluteos",cat:"cera",sub:"Feminina",nome:"Cera glúteos",min:40,preco:50,desc:"Região glútea completa.",foto:""},
+{id:"cera-perianal",cat:"cera",sub:"Feminina",nome:"Cera perianal",min:30,preco:50,desc:"Higiene e conforto, com total privacidade.",foto:""},
+
+/* ---------------- CERA — MASCULINO ---------------- */
+{id:"cera-masc-axilas",cat:"cera",sub:"Masculina",nome:"Cera masculina axilas",min:40,preco:60,desc:"Cera quente masculina com pós-calmante.",foto:""},
+{id:"cera-masc-peito",cat:"cera",sub:"Masculina",nome:"Cera masculina peito",min:60,preco:70,desc:"Tórax completo, resultado imediato.",foto:""},
+{id:"cera-masc-abdomen",cat:"cera",sub:"Masculina",nome:"Cera masculina abdômen",min:60,preco:70,desc:"Abdômen completo com cera específica para pelo grosso.",foto:""},
+{id:"cera-masc-costas",cat:"cera",sub:"Masculina",nome:"Cera masculina costas",min:60,preco:110,desc:"Costas inteiras, incluindo lombar.",foto:""},
+{id:"cera-masc-bracos",cat:"cera",sub:"Masculina",nome:"Cera masculina braços",min:60,preco:140,desc:"Braços completos com finalização hidratante.",foto:""},
+{id:"cera-masc-meia-perna",cat:"cera",sub:"Masculina",nome:"Cera masculina meia perna",min:60,preco:100,desc:"Do joelho ao pé — favorito de ciclistas.",foto:""},
+{id:"cera-masc-perna-inteira",cat:"cera",sub:"Masculina",nome:"Cera masculina perna inteira",min:120,preco:190,desc:"Pernas completas em sessão única.",foto:""},
+{id:"cera-masc-dedos",cat:"cera",sub:"Masculina",nome:"Cera masculina dedos (pés e mãos)",min:30,preco:50,desc:"Detalhe que faz diferença no acabamento.",foto:""}
+];
+
+/* ---- FOTOS ----
+   Arquivos em /fotos (quadrados, 640x640). Para trocar por foto real do seu trabalho,
+   basta substituir o arquivo .jpg com o mesmo nome — ou preencher foto:"..." no serviço acima.
+   Se algum arquivo faltar, o card volta sozinho para o gradiente da categoria. */
+const FOTOS_DIR = "fotos/";
+const FOTOS = {
+  /* facial */
+  "limpeza-de-pele-premium":"limpeza-pele", "limpeza-de-pele-glow":"limpeza-glow",
+  "peeling":"peeling", "microagulhamento":"microagulhamento",
+  "microagulhamento-sem-agulhas":"micro-sem-agulhas", "revitalizacao-facial":"revitalizacao",
+  "tratamento-rejuvenescimento":"rejuvenescimento", "tratamento-rosacea":"acne-rosacea",
+  "tratamento-acne":"acne", "hydra-gloss-lips":"labios", "rinomodelagem":"rinomodelagem",
+  /* corporal */
+  "drenagem-linfatica":"drenagem", "detox-corporal":"detox", "esfoliacao-corporal":"esfoliacao",
+  "banho-de-lua-bracos":"banho-lua", "banho-de-lua-pernas":"banho-lua", "banho-de-lua-completo":"banho-lua",
+  "gessoterapia":"gessoterapia", "liporedux":"liporedux", "massagem-modeladora":"modeladora",
+  "aplicacao-de-enzimas":"enzimas", "secagem-de-vasinhos":"vasinhos",
+  "clareamento-axilas":"clareamento", "clareamento-intimo":"clareamento",
+  "tratamento-foliculite":"foliculite", "manchas-solares-maos":"maos",
+  /* terapias */
+  "massagem-relaxante-60":"relaxante", "massagem-relaxante-30":"relaxante",
+  "pedras-quentes":"pedras-quentes", "ventosaterapia":"ventosa", "relaxante-e-ventosa":"ventosa",
+  "escalda-pes":"escalda-pes", "acupuntura-auricular":"acupuntura",
+  /* laser feminino — uma foto para cada área */
+  "laser-buco":"laser-rosto", "laser-queixo-buco":"laser-rosto", "laser-combo-axila-buco":"laser-rosto",
+  "laser-axilas":"laser-axilas", "laser-faixa-umbigo":"laser-umbigo", "laser-gluteos":"laser-gluteos",
+  "laser-perianal":"laser-perianal", "laser-bracos":"laser-bracos",
+  "laser-virilha-simples":"laser-virilha-simples", "laser-virilha-cavada":"laser-virilha-cavada",
+  "laser-virilha-completa":"laser-virilha-completa", "laser-combo-virilha-axila":"laser-combo",
+  /* laser masculino — uma foto para cada área */
+  "laser-masc-barba":"laser-m-barba", "laser-masc-axilas":"laser-m-axilas",
+  "laser-masc-peito":"laser-m-peito", "laser-masc-abdomen":"laser-m-abdomen",
+  "laser-masc-costas":"laser-m-costas", "laser-masc-bracos":"laser-m-bracos",
+  "laser-masc-meia-perna":"laser-m-meia-perna", "laser-masc-perna-inteira":"laser-m-perna-inteira",
+  /* cera feminina — uma foto para cada área */
+  "cera-buco":"cera-rosto", "cera-rosto":"cera-rosto", "cera-nariz-orelha":"cera-rosto",
+  "cera-axilas":"cera-axilas", "cera-bracos":"cera-bracos", "cera-faixa-umbigo":"cera-umbigo",
+  "cera-gluteos":"cera-gluteos", "cera-perianal":"cera-perianal",
+  "cera-virilha-simples":"cera-virilha-simples", "cera-virilha-cavada":"cera-virilha-cavada",
+  "cera-virilha-completa":"cera-virilha-completa",
+  /* cera masculina — uma foto para cada área (peito usa a foto padrão, que já é de tórax) */
+  "cera-masc-axilas":"cera-m-axilas", "cera-masc-abdomen":"cera-m-abdomen",
+  "cera-masc-costas":"cera-m-costas", "cera-masc-bracos":"cera-m-bracos",
+  "cera-masc-meia-perna":"cera-m-meia-perna", "cera-masc-perna-inteira":"cera-m-perna-inteira",
+  "cera-masc-dedos":"cera-m-dedos"
+};
+/* fallback por categoria (e por subgrupo Feminina/Masculina) */
+const FOTO_PADRAO = {
+  "facial":"limpeza-pele", "corporal":"drenagem", "terapias":"relaxante",
+  "laser|Feminina":"laser-fem", "laser|Masculina":"laser-masc",
+  "cera|Feminina":"cera-fem",   "cera|Masculina":"cera-masc"
+};
+
+/* sugestões de cross-sell por categoria (ordem de prioridade) */
+const XSELL = {
+  facial:  ["revitalizacao-facial","limpeza-de-pele-premium","hydra-gloss-lips"],
+  corporal:["drenagem-linfatica","esfoliacao-corporal","clareamento-axilas"],
+  terapias:["massagem-relaxante-30","escalda-pes","ventosaterapia"],
+  laser:   ["laser-axilas","laser-buco","laser-faixa-umbigo"],
+  cera:    ["cera-buco","cera-axilas","cera-nariz-orelha"]
+};
+
+/* ============================================================================
+   2) HELPERS
+   ========================================================================== */
+const $  = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const byId = Object.fromEntries(SERVICES.map(s => [s.id, s]));
+const DIAS  = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
+const MESES = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
+
+const money = n => "R$ " + n.toFixed(2).replace(".", ",");
+const dur = m => { const h = Math.floor(m/60), r = m%60;
+  return h ? (r ? h+"h"+String(r).padStart(2,"0") : h+"h") : r+"min"; };
+const hm2min = s => { const [h,m] = s.split(":").map(Number); return h*60+m; };
+const min2hm = m => String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0");
+const ymd = d => d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+
+const GRAD = {
+  facial:  ["#E9C3C8","#9B1226"], corporal:["#DCC5B6","#96604E"],
+  terapias:["#C9CFC2","#6F7F6C"], laser:   ["#C9B4BE","#6E1B3C"],
+  cera:    ["#EED9B6","#B08A1E"]
+};
+function ph(s){
+  const g = GRAD[s.cat] || GRAD.facial;
+  const t = s.nome.replace(/[^A-Za-zÀ-ÿ ]/g," ").trim().split(/\s+/).slice(0,2).map(w=>w[0]).join("").toUpperCase();
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${g[0]}"/><stop offset="1" stop-color="${g[1]}"/></linearGradient></defs><rect width="400" height="400" fill="url(#g)"/><circle cx="200" cy="200" r="128" fill="none" stroke="rgba(255,255,255,.42)" stroke-width="1.4"/><circle cx="200" cy="200" r="100" fill="none" stroke="rgba(255,255,255,.26)" stroke-width="1"/><text x="200" y="232" font-family="Georgia,serif" font-size="88" fill="rgba(255,255,255,.94)" text-anchor="middle">${t}</text></svg>`;
+  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+}
+function fotoDe(s){
+  const f = FOTOS[s.id] || FOTO_PADRAO[s.cat + "|" + (s.sub || "")] || FOTO_PADRAO[s.cat];
+  return f ? FOTOS_DIR + f + ".jpg" : "";
+}
+const imgOf = s => s.foto || fotoDe(s) || ph(s);
+/* se a foto não existir, cai no gradiente da categoria sem quebrar o card */
+function phFail(el){ el.onerror = null; el.src = ph(byId[el.dataset.sid]); }
+
+/* ============================================================================
+   3) ESTADO
+   ========================================================================== */
+const state = { sel: [], date: null, time: null, prof: "sem", coupon: null };
+
+/* ============================================================================
+   4) RENDER — cabeçalho, catálogo, equipe, SEO
+   ========================================================================== */
+function mapsLink(){
+  return CONFIG.mapsUrl || "https://www.google.com/maps/search/?api=1&query=" +
+    encodeURIComponent(CONFIG.nome + " " + CONFIG.endereco);
+}
+function horarioTexto(){
+  return "Seg a Sex 9h–18h · Sáb 9h–16h";
+}
+function renderHead(){
+  document.title = `${CONFIG.nome} — Estética Avançada e Depilação a Laser em ${CONFIG.cidade} | Agendamento online`;
+  $("#hName").textContent = CONFIG.nome;
+  $("#fName").textContent = CONFIG.nome;
+  const lg = $("h1.brandlogo img"); lg.src = CONFIG.logo; lg.alt = CONFIG.nome;
+  $("#hSlogan").textContent = CONFIG.slogan;
+  $("#fHour").textContent = horarioTexto();
+  $("#fAddr").textContent = CONFIG.endereco;
+  $("#fAddr2").textContent = CONFIG.endereco;
+  $("#fPhone").innerHTML = `WhatsApp <a href="https://wa.me/${CONFIG.whatsapp}">${CONFIG.telefoneExibicao}</a>`;
+  $("#yr").textContent = new Date().getFullYear();
+  $("#btnMaps").onclick = () => window.open(mapsLink(), "_blank");
+
+  const team = $("#team");
+  team.className = "team" + (PROFS.length === 1 ? " solo" : "");
+  team.innerHTML = PROFS.map(p => `
+    <div class="tcard">
+      ${p.foto
+        ? `<img class="tav-foto" src="${p.foto}" alt="${p.nome}" loading="lazy"
+             onerror="this.outerHTML='<div class=\\'tav\\'>${p.nome[0]}</div>'">`
+        : `<div class="tav">${p.nome[0]}</div>`}
+      <div><b>${p.nome}</b><span>${p.papel}</span></div></div>`).join("");
+}
+function renderCatalog(){
+  $("#tabs").innerHTML = CATS.map((c,i) =>
+    `<button class="tab${i===0?" on":""}" data-go="cat-${c.id}">${c.tab}</button>`).join("");
+
+  $("#catalog").innerHTML = CATS.map(c => {
+    const items = SERVICES.filter(s => s.cat === c.id);
+    const subs = [...new Set(items.map(s => s.sub || ""))];
+    const body = subs.map(sub => {
+      const list = items.filter(s => (s.sub || "") === sub);
+      return (sub ? `<div class="subhead">${sub}</div>` : "") +
+        `<div class="grid">${list.map(cardHTML).join("")}</div>`;
+    }).join("");
+    return `<section class="cat" id="cat-${c.id}">
+      <div class="cat-head"><h2>${c.nome}</h2></div>
+      <p class="cat-sub">${c.sub}</p>${body}</section>`;
+  }).join("");
+
+  $$(".tab").forEach(t => t.onclick = () =>
+    document.getElementById(t.dataset.go).scrollIntoView({behavior:"smooth", block:"start"}));
+
+  $$("[data-add]").forEach(b => b.onclick = () => toggle(b.dataset.add));
+  spy();
+}
+function cardHTML(s){
+  return `<article class="card" id="c-${s.id}">
+    <div class="thumb"><img src="${imgOf(s)}" alt="${s.nome}" loading="lazy" decoding="async"
+      data-sid="${s.id}" onerror="phFail(this)"><div class="badge-check">✓</div></div>
+    <div class="card-b">
+      <h3>${s.nome}</h3>
+      <p>${s.desc}</p>
+      <div class="meta">
+        <span class="dur">🕐 ${dur(s.min)}</span>
+        <span class="price">${s.ap?'<small>a partir de</small>':''}${money(s.preco)}</span>
+      </div>
+      <button class="add" data-add="${s.id}">Agendar</button>
+    </div></article>`;
+}
+function spy(){
+  const secs = CATS.map(c => document.getElementById("cat-"+c.id));
+  const io = new IntersectionObserver(es => {
+    es.forEach(e => { if(e.isIntersecting){
+      const id = e.target.id;
+      $$(".tab").forEach(t => t.classList.toggle("on", t.dataset.go === id));
+      const on = $(".tab.on"); if(on) on.scrollIntoView({block:"nearest", inline:"center", behavior:"smooth"});
+    }});
+  }, {rootMargin:"-62px 0px -70% 0px", threshold:0});
+  secs.forEach(s => io.observe(s));
+}
+
+/* ============================================================================
+   5) SELEÇÃO DE SERVIÇOS
+   ========================================================================== */
+function toggle(id, keepOpen){
+  const i = state.sel.indexOf(id);
+  if(i >= 0) state.sel.splice(i,1); else state.sel.push(id);
+  const card = document.getElementById("c-"+id);
+  if(card){
+    card.classList.toggle("on", state.sel.includes(id));
+    card.querySelector(".add").textContent = state.sel.includes(id) ? "Selecionado ✓" : "Agendar";
+  }
+  syncAll(keepOpen);
+}
+/* normaliza o código digitado: tira acento, espaço e caixa */
+const normCupom = s => (s || "").trim().toUpperCase()
+  .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+/* devolve null se o cupom vale, ou a mensagem do porquê não vale */
+function cupomErro(code, items, sub){
+  const c = CONFIG.cupons[code];
+  if(!c) return "Cupom inválido ou expirado.";
+  if(c.minItens && items.length < c.minItens)
+    return `O cupom ${code} vale para ${c.minItens} ou mais procedimentos no mesmo agendamento.`;
+  if(c.minimo && sub < c.minimo)
+    return `O cupom ${code} vale a partir de ${money(c.minimo)} em serviços.`;
+  if(c.cats && !items.some(s => c.cats.includes(s.cat)))
+    return `O cupom ${code} não vale para os serviços escolhidos.`;
+  return null;
+}
+
+function totals(){
+  const items = state.sel.map(id => byId[id]);
+  const minutes = items.reduce((a,s) => a + s.min, 0);
+  const sub = items.reduce((a,s) => a + s.preco, 0);
+  let desc = 0, erro = null;
+  if(state.coupon){
+    /* revalida a cada mudança: se a pessoa remover um serviço, o desconto cai junto */
+    erro = cupomErro(state.coupon, items, sub);
+    if(!erro){
+      const c = CONFIG.cupons[state.coupon];
+      const base = c.cats ? items.filter(s => c.cats.includes(s.cat)).reduce((a,s)=>a+s.preco,0) : sub;
+      desc = c.tipo === "percent" ? base * c.valor/100 : (base > 0 ? c.valor : 0);
+      if(desc > sub) desc = sub;
+    }
+  }
+  return {items, minutes, sub, desc, total: sub - desc, erro};
+}
+function syncAll(keepOpen){
+  const t = totals();
+  $("#floatbar").classList.toggle("show", t.items.length > 0);
+  $("#fbCount").textContent = t.items.length + (t.items.length === 1 ? " serviço" : " serviços");
+  $("#fbDur").textContent = t.minutes ? "duração estimada " + dur(t.minutes) : "—";
+  $("#fbTotal").textContent = money(t.total);
+  if($("#sheet").classList.contains("open") || keepOpen) renderSheet();
+  if(t.items.length === 0 && $("#sheet").classList.contains("open")) closeSheet();
+}
+
+/* ============================================================================
+   6) AGENDA — dias e horários
+   ========================================================================== */
+function openDays(n = 14){
+  const out = [], d = new Date(); d.setHours(0,0,0,0);
+  for(let i = 0; out.length < n && i < 90; i++){
+    const day = new Date(d); day.setDate(d.getDate() + i);
+    const h = CONFIG.horarios[day.getDay()];
+    if(!h) continue;
+    if(CONFIG.feriados.includes(ymd(day))) continue;
+    // se é hoje, só entra se ainda cabe algum horário
+    if(i === 0 && slotsFor(day).length === 0) continue;
+    out.push(day);
+  }
+  return out;
+}
+function slotsFor(date){
+  const h = CONFIG.horarios[date.getDay()]; if(!h) return [];
+  const dTot = Math.max(totals().minutes, CONFIG.slotMin);
+  const abre = hm2min(h[0]), fecha = hm2min(h[1]);
+  const now = new Date(), hoje = ymd(now) === ymd(date);
+  const minStart = hoje ? now.getHours()*60 + now.getMinutes() + CONFIG.antecedenciaMin : 0;
+  const out = [];
+  for(let m = abre; m + dTot <= fecha; m += CONFIG.slotMin){
+    if(m >= minStart) out.push(min2hm(m));
+  }
+  return out;
+}
+function statusNow(){
+  const now = new Date(), h = CONFIG.horarios[now.getDay()];
+  const cur = now.getHours()*60 + now.getMinutes();
+  const feriado = CONFIG.feriados.includes(ymd(now));
+  if(h && !feriado && cur >= hm2min(h[0]) && cur < hm2min(h[1])) return {open:true, txt:"Aberto agora"};
+  // próximo dia aberto
+  for(let i = (h && !feriado && cur < hm2min(h[0])) ? 0 : 1; i < 10; i++){
+    const d = new Date(); d.setDate(d.getDate() + i);
+    const hh = CONFIG.horarios[d.getDay()];
+    if(!hh || CONFIG.feriados.includes(ymd(d))) continue;
+    const quando = i === 0 ? "hoje" : i === 1 ? "amanhã" : DIAS[d.getDay()].toLowerCase();
+    return {open:false, txt:`Abrimos ${quando} às ${hh[0].replace(":00","h").replace(":","h")}`};
+  }
+  return {open:false, txt:"Fechado"};
+}
+
+/* ============================================================================
+   7) SHEET (checkout)
+   ========================================================================== */
+function openSheet(){ $("#sheet").classList.add("open"); $("#sheet").setAttribute("aria-hidden","false");
+  document.body.style.overflow = "hidden"; renderSheet(); }
+function closeSheet(){ $("#sheet").classList.remove("open"); $("#sheet").setAttribute("aria-hidden","true");
+  document.body.style.overflow = ""; }
+
+function renderSheet(){
+  const t = totals();
+
+  /* --- itens --- */
+  $("#shBody").innerHTML = t.items.length ? t.items.map(s => `
+    <div class="line">
+      <img src="${imgOf(s)}" alt="" data-sid="${s.id}" onerror="phFail(this)">
+      <div class="t"><b>${s.nome}</b><span>${dur(s.min)} · ${s.ap?"a partir de ":""}${money(s.preco)}</span></div>
+      <span class="p">${money(s.preco)}</span>
+      <button class="rm" data-rm="${s.id}" aria-label="Remover">×</button>
+    </div>`).join("") : `<div class="empty">Nenhum serviço selecionado ainda.</div>`;
+  $$("[data-rm]").forEach(b => b.onclick = () => toggle(b.dataset.rm, true));
+
+  /* --- cross-sell: categorias que o cliente ainda não escolheu --- */
+  const chosen = new Set(t.items.map(s => s.cat));
+  const sugg = [];
+  CATS.forEach(c => { if(chosen.has(c.id)) return;
+    (XSELL[c.id] || []).slice(0,2).forEach(id => { if(byId[id] && !state.sel.includes(id)) sugg.push(byId[id]); });
+  });
+  const top = sugg.slice(0,6);
+  $("#xsell").hidden = top.length === 0;
+  /* quando falta 1 serviço para o cupom, o bloco vira gancho de desconto */
+  const cq = CONFIG.cupomDestaque ? CONFIG.cupons[CONFIG.cupomDestaque] : null;
+  $("#xlabel").textContent = (cq && cq.minItens && t.items.length === cq.minItens - 1)
+    ? `Adicione mais 1 e ganhe ${cq.valor}% com o cupom ${CONFIG.cupomDestaque}`
+    : "Aproveite e agende também";
+  $("#xchips").innerHTML = top.map(s =>
+    `<button class="xchip" data-x="${s.id}">+ ${s.nome} · <b>${money(s.preco)}</b></button>`).join("");
+  $$("[data-x]").forEach(b => b.onclick = () => toggle(b.dataset.x, true));
+
+  /* --- dias --- */
+  const days = openDays(14);
+  if(!state.date || !days.some(d => ymd(d) === state.date)) state.date = days.length ? ymd(days[0]) : null;
+  $("#days").innerHTML = days.map(d => `
+    <button class="chip${ymd(d) === state.date ? " on" : ""}" data-day="${ymd(d)}">
+      <span class="d">${DIAS[d.getDay()]}</span>
+      <span class="n">${d.getDate()}</span>
+      <span class="d">${MESES[d.getMonth()]}</span>
+    </button>`).join("");
+  $$("[data-day]").forEach(b => b.onclick = () => { state.date = b.dataset.day; state.time = null; renderSheet(); });
+
+  /* --- horários --- */
+  const dObj = state.date ? new Date(state.date + "T12:00:00") : null;
+  const sl = dObj ? slotsFor(dObj) : [];
+  if(state.time && !sl.includes(state.time)) state.time = null;
+  $("#slots").innerHTML = sl.length
+    ? sl.map(h => `<button class="slot${h === state.time ? " on" : ""}" data-slot="${h}">${h}</button>`).join("")
+    : `<div class="empty" style="grid-column:1/-1">Sem horário livre para essa duração nesse dia. Escolha outro dia.</div>`;
+  $$("[data-slot]").forEach(b => b.onclick = () => { state.time = b.dataset.slot; renderSheet(); });
+  $("#slotNote").textContent = t.minutes
+    ? `Reservamos ${dur(t.minutes)} para você — os horários já consideram essa duração.` : "";
+
+  /* --- profissionais que atendem o que foi escolhido --- */
+  let pool = PROFS.filter(p => t.items.some(s => (s.profs ? s.profs.includes(p.id) : p.cats.includes(s.cat))));
+  if(!pool.length) pool = PROFS;
+  if(pool.length < 2){
+    /* uma profissional só: não faz sentido pedir escolha — some o passo */
+    state.prof = pool.length ? pool[0].id : "sem";
+    $("#profBlock").hidden = true;
+  } else {
+    $("#profBlock").hidden = false;
+    if(!pool.some(p => p.id === state.prof)) state.prof = "sem";
+    $("#profs").innerHTML =
+      `<button class="prof${state.prof === "sem" ? " on" : ""}" data-prof="sem"><b>Sem preferência</b><span>a clínica escolhe</span></button>` +
+      pool.map(p => `<button class="prof${state.prof === p.id ? " on" : ""}" data-prof="${p.id}"><b>${p.nome}</b><span>${p.papel}</span></button>`).join("");
+    $$("[data-prof]").forEach(b => b.onclick = () => { state.prof = b.dataset.prof; renderSheet(); });
+    const cats = new Set(t.items.map(s => s.cat));
+    $("#profNote").textContent = cats.size > 1
+      ? "Sua seleção envolve mais de uma especialidade — a clínica organiza a sequência no mesmo horário." : "";
+  }
+
+  /* --- resumo --- */
+  const c = state.coupon ? CONFIG.cupons[state.coupon] : null;
+  $("#sum").innerHTML = `
+    <div><span>Serviços (${t.items.length})</span><span>${money(t.sub)}</span></div>
+    ${(c && t.desc > 0) ? `<div class="disc"><span>Cupom ${state.coupon} (${c.desc})</span><span>-${money(t.desc)}</span></div>` : ""}
+    <div><span>Duração estimada</span><span>${t.minutes ? dur(t.minutes) : "—"}</span></div>
+    <div class="tot"><span>Total</span><span>${money(t.total)}</span></div>`;
+
+  /* --- cupom: mensagem e chamada --- */
+  const cm = $("#couponMsg"), ch = $("#couponHint");
+  if(state.coupon){
+    if(t.erro){ cm.className = "hinterr"; cm.textContent = t.erro; }
+    else{ cm.className = "hintok";
+      cm.textContent = `Cupom ${state.coupon} aplicado — ${c.tipo === "percent" ? c.valor + "% de desconto" : money(c.valor) + " de desconto"}.`; }
+  }
+  const dq = CONFIG.cupomDestaque, cd = dq ? CONFIG.cupons[dq] : null;
+  if(cd && (!state.coupon || t.erro)){
+    const falta = (cd.minItens || 1) - t.items.length;
+    ch.textContent = falta > 0
+      ? `Agende ${cd.minItens} procedimentos e use o cupom ${dq}: ${cd.valor}% de desconto.`
+      : `Você já tem ${t.items.length} procedimentos — digite ${dq} acima e ganhe ${cd.valor}%.`;
+  } else ch.textContent = "";
+
+  /* --- aviso fora do expediente --- */
+  const st = statusNow();
+  $("#closedWarn").hidden = st.open;
+  $("#closedWarn").textContent = st.open ? "" : `Estamos fechados agora — ${st.txt}. Pode deixar seu horário marcado que confirmamos assim que abrirmos.`;
+  $("#btnSend").textContent = st.open ? "Enviar pelo WhatsApp" : "Deixar horário marcado no WhatsApp";
+  $("#btnSend").disabled = !(t.items.length && state.date && state.time);
+}
+
+/* --- cupom --- */
+$("#btnCoupon").onclick = () => {
+  const code = normCupom($("#cCoupon").value);
+  const msg = $("#couponMsg");
+  const items = state.sel.map(id => byId[id]);
+  const sub = items.reduce((a, s) => a + s.preco, 0);
+  const err = cupomErro(code, items, sub);
+  if(err){
+    state.coupon = null; msg.className = "hinterr"; msg.textContent = err; renderSheet(); return;
+  }
+  const c = CONFIG.cupons[code];
+  state.coupon = code; msg.className = "hintok";
+  msg.textContent = `Cupom ${code} aplicado — ${c.tipo === "percent" ? c.valor + "% de desconto" : money(c.valor) + " de desconto"}.`;
+  renderSheet();
+};
+
+/* ============================================================================
+   8) ENVIO PELO WHATSAPP (sem emojis — quebram no WhatsApp Desktop)
+   ========================================================================== */
+function fmtDataBR(iso){
+  const d = new Date(iso + "T12:00:00");
+  return `${DIAS[d.getDay()]}, ${String(d.getDate()).padStart(2,"0")}/${String(d.getMonth()+1).padStart(2,"0")}/${d.getFullYear()}`;
+}
+$("#btnSend").onclick = () => {
+  const t = totals();
+  const nome = ($("#cName").value || "").trim();
+  const fone = ($("#cPhone").value || "").trim();
+  if(!nome){ $("#cName").focus(); $("#cName").style.borderColor = "#B3453D"; return; }
+  if(fone.replace(/\D/g,"").length < 10){ $("#cPhone").focus(); $("#cPhone").style.borderColor = "#B3453D"; return; }
+
+  localStorage.setItem("cli_cliente", JSON.stringify({nome, fone}));
+  localStorage.setItem("cli_last", JSON.stringify(state.sel));
+
+  const pObj = PROFS.find(p => p.id === state.prof);
+  const prof = pObj ? pObj.nome : "Sem preferência";
+  const c = state.coupon ? CONFIG.cupons[state.coupon] : null;
+
+  const L = [];
+  L.push(`*AGENDAMENTO — ${CONFIG.nome}*`, "");
+  L.push(`*Cliente:* ${nome}`);
+  L.push(`*WhatsApp:* ${fone}`);
+  L.push(`*Data:* ${fmtDataBR(state.date)}`);
+  L.push(`*Horário:* ${state.time}`);
+  L.push(`*Profissional:* ${prof}`, "");
+  L.push("*Serviços:*");
+  t.items.forEach(s => L.push(`• ${s.nome} — ${s.ap ? "a partir de " : ""}${money(s.preco)} (${dur(s.min)})`));
+  L.push("");
+  L.push(`*Duração estimada:* ${dur(t.minutes)}`);
+  L.push(`*Subtotal:* ${money(t.sub)}`);
+  if(c) L.push(`*Cupom ${state.coupon}:* -${money(t.desc)}`);
+  L.push(`*Total:* ${money(t.total)}`);
+  L.push("", "_Agendamento feito pelo site_");
+
+  window.open(`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(L.join("\n"))}`, "_blank");
+};
+
+/* ============================================================================
+   9) BOOT — localStorage, deep link, status, PWA, JSON-LD
+   ========================================================================== */
+renderHead();
+renderCatalog();
+
+/* status aberto/fechado */
+(function(){ const st = statusNow();
+  $("#stTxt").textContent = st.txt;
+  $("#stDot").className = "dot" + (st.open ? "" : " off");
+})();
+
+/* dados do cliente salvos */
+try{ const c = JSON.parse(localStorage.getItem("cli_cliente") || "null");
+  if(c){ $("#cName").value = c.nome || ""; $("#cPhone").value = c.fone || ""; } }catch(e){}
+
+/* repetir últimos serviços */
+try{ const last = JSON.parse(localStorage.getItem("cli_last") || "[]").filter(id => byId[id]);
+  if(last.length){
+    $("#repeatWrap").hidden = false;
+    $("#btnRepeat").onclick = () => { state.sel = []; $$(".card.on").forEach(c => c.classList.remove("on"));
+      $$(".add").forEach(b => b.textContent = "Agendar");
+      last.forEach(id => toggle(id)); openSheet(); };
+  } }catch(e){}
+
+/* deep link ?servico=slug (aceita vários separados por vírgula) */
+(function(){
+  const q = new URLSearchParams(location.search).get("servico");
+  if(!q) return;
+  const ids = q.split(",").map(s => s.trim()).filter(id => byId[id]);
+  if(!ids.length) return;
+  ids.forEach(id => toggle(id));
+  setTimeout(() => { document.getElementById("c-"+ids[0])?.scrollIntoView({behavior:"smooth", block:"center"}); openSheet(); }, 400);
+})();
+
+/* sheet handlers */
+$("#fbGo").onclick = openSheet;
+$("#shClose").onclick = closeSheet;
+$("#shBg").onclick = closeSheet;
+document.addEventListener("keydown", e => { if(e.key === "Escape") closeSheet(); });
+["cName","cPhone"].forEach(id => $("#"+id).addEventListener("input", e => e.target.style.borderColor = ""));
+
+/* PWA */
+if("serviceWorker" in navigator) addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
+let deferredPrompt = null;
+addEventListener("beforeinstallprompt", e => {
+  e.preventDefault(); deferredPrompt = e;
+  const isMobile = matchMedia("(max-width: 768px)").matches || matchMedia("(pointer: coarse)").matches;
+  if(isMobile && !localStorage.getItem("cli_pwa_no")) $("#pwaBar").classList.add("show");
+});
+$("#pwaYes").onclick = async () => { $("#pwaBar").classList.remove("show");
+  if(deferredPrompt){ deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; } };
+$("#pwaNo").onclick = () => { $("#pwaBar").classList.remove("show"); localStorage.setItem("cli_pwa_no","1"); };
+
+/* JSON-LD BeautySalon */
+$("#ldjson").textContent = JSON.stringify({
+  "@context":"https://schema.org","@type":"BeautySalon",
+  name: CONFIG.nome, description: CONFIG.slogan, url: location.origin + location.pathname,
+  logo: new URL(CONFIG.logo, location.href).href, image: new URL(CONFIG.logo, location.href).href,
+  telephone: "+" + CONFIG.whatsapp, priceRange: "$$",
+  address:{"@type":"PostalAddress", streetAddress: CONFIG.logradouro, addressLocality: CONFIG.cidade,
+           addressRegion: CONFIG.uf, postalCode: CONFIG.cep, addressCountry:"BR"},
+  areaServed: CONFIG.cidade, hasMap: mapsLink(),
+  employee: PROFS.map(p => ({"@type":"Person", name:p.nome, jobTitle:p.papel})),
+  openingHoursSpecification:[
+    {"@type":"OpeningHoursSpecification", dayOfWeek:["Monday","Tuesday","Wednesday","Thursday","Friday"], opens:"09:00", closes:"18:00"},
+    {"@type":"OpeningHoursSpecification", dayOfWeek:["Saturday"], opens:"09:00", closes:"16:00"}
+  ],
+  hasOfferCatalog:{"@type":"OfferCatalog", name:"Procedimentos", itemListElement: CATS.map(c => ({
+    "@type":"OfferCatalog", name:c.nome,
+    itemListElement: SERVICES.filter(s => s.cat === c.id).slice(0,8).map(s => ({
+      "@type":"Offer", priceCurrency:"BRL", price:s.preco,
+      itemOffered:{"@type":"Service", name:s.nome, description:s.desc}
+    }))
+  }))}
+});
+</script>
+</body>
+</html>
