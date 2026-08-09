@@ -4,7 +4,6 @@
   "trailingSlash": false,
   "headers": [
     {
-      "comment": "Fotos e ícones nunca mudam de nome — cache de 1 ano no navegador da cliente",
       "source": "/fotos/(.*)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
@@ -17,7 +16,6 @@
       ]
     },
     {
-      "comment": "O service worker NUNCA pode ficar em cache longo, senão o site trava numa versão antiga",
       "source": "/sw.js",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" },
@@ -36,7 +34,7 @@
         { "key": "X-Content-Type-Options", "value": "nosniff" },
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
         { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
-        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(), interest-cohort=()" }
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
       ]
     }
   ]
