@@ -7,7 +7,14 @@
 <meta name="description" content="SR Estética e Bem Estar: há mais de 7 anos no Centro de Tatuí/SP com estética facial, corporal, massagens, depilação a laser e cera. Atendimento personalizado com Simone. Agende online em 1 minuto pelo WhatsApp. Seg a Sex 9h-18h, Sáb 9h-16h.">
 <meta name="theme-color" content="#9B1226">
 <link rel="manifest" href="manifest.json">
+<!-- iPhone: o manifest.json é ignorado no "Adicionar à Tela de Início", quem manda é isto -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="SR Estética">
+<meta name="format-detection" content="telephone=no">
 <link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 
 <!-- Open Graph / WhatsApp preview -->
@@ -42,6 +49,8 @@
   --sh-1:0 1px 2px rgba(43,34,37,.05), 0 6px 18px rgba(43,34,37,.06);
   --sh-2:0 10px 40px rgba(43,34,37,.16);
   --maxw:1120px;
+  /* constant() é o nome antigo, usado no iOS 11.0–11.2; env() cobre o resto */
+  --safe:constant(safe-area-inset-bottom,0px);
   --safe:env(safe-area-inset-bottom,0px);
 }
 *{box-sizing:border-box}
@@ -51,9 +60,14 @@ body{
   font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
   font-size:15px; line-height:1.55; -webkit-font-smoothing:antialiased;
   padding-bottom:96px;
+  /* iOS: impede o Safari de inflar o texto ao girar o aparelho */
+  -webkit-text-size-adjust:100%; text-size-adjust:100%;
+  -webkit-tap-highlight-color:rgba(155,18,38,.12);
+  overflow-x:hidden;
 }
 img{max-width:100%;display:block}
-button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;
+  -webkit-appearance:none;appearance:none}
 a{color:inherit}
 .wrap{max-width:var(--maxw);margin:0 auto;padding:0 18px}
 .serif{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;letter-spacing:.2px}
@@ -68,7 +82,7 @@ header.hero{
     linear-gradient(180deg,#FFFDFC 0%, var(--bg) 100%);
   border-bottom:1px solid var(--line);
 }
-.hero:after{content:"";position:absolute;inset:auto 0 0 0;height:1px;
+.hero:after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;
   background:linear-gradient(90deg,transparent,var(--gold-l),transparent)}
 .hero-in{padding:30px 0 26px;text-align:center}
 /* logo da marca */
@@ -97,6 +111,7 @@ h1.brandlogo + .eyebrow{margin-top:16px}
 
 /* ---------- TABS (sticky + scrollspy) ---------- */
 nav.tabs{position:sticky;top:0;z-index:40;background:rgba(251,247,245,.92);
+  -webkit-backdrop-filter:saturate(1.4) blur(12px);
   backdrop-filter:saturate(1.4) blur(12px);border-bottom:1px solid var(--line)}
 .tabs-in{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:10px 18px;max-width:var(--maxw);margin:0 auto}
 .tabs-in::-webkit-scrollbar{display:none}
@@ -157,6 +172,8 @@ section.cat{padding:34px 0 6px;scroll-margin-top:64px}
   border-radius:var(--r-lg);padding:28px 22px;box-shadow:var(--sh-1)}
 .about-foto{width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:var(--r-md);
   margin-bottom:20px;box-shadow:var(--sh-1)}
+/* iOS 14 e anteriores não têm aspect-ratio */
+@supports not (aspect-ratio:1/1){ .about-foto{height:210px} }
 .about h2{margin:6px 0 10px;font-size:clamp(22px,5vw,30px);font-family:"Cormorant Garamond",serif;font-weight:600}
 .about p{margin:0 0 14px;color:var(--ink-2);font-size:14.5px;line-height:1.65;max-width:70ch}
 .about p strong{color:var(--ink);font-weight:600}
@@ -197,16 +214,23 @@ footer{margin-top:38px;border-top:1px solid var(--line);background:#fff}
   font-weight:600;font-size:14px;color:#fff;white-space:nowrap}
 
 /* ---------- BOTTOM SHEET (checkout) ---------- */
-.sheet{position:fixed;inset:0;z-index:90;display:none}
+/* top/right/bottom/left separados: a forma curta "inset" só existe no
+   Safari 14.1+, e sem ela o painel ficaria com tamanho zero no iPhone */
+.sheet{position:fixed;top:0;right:0;bottom:0;left:0;z-index:90;display:none}
 .sheet.open{display:block}
-.sh-bg{position:absolute;inset:0;background:rgba(43,34,37,.5);backdrop-filter:blur(3px);animation:fade .2s}
+.sh-bg{position:absolute;top:0;right:0;bottom:0;left:0;background:rgba(43,34,37,.5);
+  -webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);animation:fade .2s}
 @keyframes fade{from{opacity:0}}
 .sh-card{
   position:absolute;left:0;right:0;bottom:0;margin:0 auto;max-width:560px;
   background:var(--bg);border-radius:24px 24px 0 0;box-shadow:var(--sh-2);
   /* ---- LAYOUT CRÍTICO: coluna flex com altura limitada ---- */
   display:flex;flex-direction:column;
-  max-height:94vh;max-height:94dvh;
+  /* três valores em cascata: iOS antigo usa vh, iOS 12+ usa fill-available
+     (altura realmente visível, descontando a barra do Safari), iOS 15.4+ usa dvh */
+  max-height:94vh;
+  max-height:-webkit-fill-available;
+  max-height:94dvh;
   animation:up .3s cubic-bezier(.2,.9,.3,1);overflow:hidden;
 }
 @keyframes up{from{transform:translateY(100%)}}
@@ -253,8 +277,10 @@ footer{margin-top:38px;border-top:1px solid var(--line);background:#fff}
 .prof span{font-size:10.5px;color:var(--muted)}
 .prof.on{background:var(--ink);border-color:var(--ink);color:#fff}
 .prof.on span{color:rgba(255,255,255,.7)}
+/* 16px é obrigatório: abaixo disso o Safari do iPhone dá zoom ao focar o campo */
 input[type=text],input[type=tel]{width:100%;border:1px solid var(--line);background:#fff;border-radius:12px;
-  padding:12px 13px;font-size:15px;color:var(--ink);outline:0;transition:.15s}
+  padding:12px 13px;font-size:16px;color:var(--ink);outline:0;transition:.15s;
+  -webkit-appearance:none;appearance:none}
 input:focus{border-color:var(--rose);box-shadow:0 0 0 3px var(--rose-l)}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .cupom-row{display:flex;gap:8px}
@@ -402,7 +428,7 @@ input:focus{border-color:var(--rose);box-shadow:0 0 0 3px var(--rose-l)}
 
 <!-- =========================== PWA BAR =========================== -->
 <div class="pwa" id="pwaBar">
-  <p><b>Instale no seu celular</b><br>agende em 1 toque, sem abrir o navegador.</p>
+  <p id="pwaTxt"><b>Instale no seu celular</b><br>agende em 1 toque, sem abrir o navegador.</p>
   <button class="yes" id="pwaYes">Instalar</button>
   <button class="no" id="pwaNo">×</button>
 </div>
@@ -690,7 +716,8 @@ const XSELL = {
    ========================================================================== */
 const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
-const byId = Object.fromEntries(SERVICES.map(s => [s.id, s]));
+/* reduce em vez de Object.fromEntries, que só existe a partir do iOS 12.2 */
+const byId = SERVICES.reduce(function(acc, s){ acc[s.id] = s; return acc; }, {});
 const DIAS  = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
 const MESES = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
 
@@ -717,6 +744,16 @@ function fotoDe(s){
   return f ? FOTOS_DIR + f + ".jpg" : "";
 }
 const imgOf = s => s.foto || fotoDe(s) || ph(s);
+
+/* Abre link externo. No celular navegamos na própria aba: o Safari do iPhone
+   bloqueia window.open com frequência, e é justamente por ali que sai o
+   agendamento. No desktop abrimos em aba nova para não perder o site. */
+function abrirLink(url){
+  const noCelular = matchMedia("(max-width: 768px)").matches || matchMedia("(pointer: coarse)").matches;
+  if(noCelular){ window.location.href = url; return; }
+  const w = window.open(url, "_blank");
+  if(!w) window.location.href = url;   // bloqueado pelo navegador
+}
 /* se a foto não existir, cai no gradiente da categoria sem quebrar o card */
 function phFail(el){ el.onerror = null; el.src = ph(byId[el.dataset.sid]); }
 
@@ -746,7 +783,7 @@ function renderHead(){
   $("#fAddr2").textContent = CONFIG.endereco;
   $("#fPhone").innerHTML = `WhatsApp <a href="https://wa.me/${CONFIG.whatsapp}">${CONFIG.telefoneExibicao}</a>`;
   $("#yr").textContent = new Date().getFullYear();
-  $("#btnMaps").onclick = () => window.open(mapsLink(), "_blank");
+  $("#btnMaps").onclick = () => abrirLink(mapsLink());
 
   const team = $("#team");
   team.className = "team" + (PROFS.length === 1 ? " solo" : "");
@@ -911,10 +948,29 @@ function statusNow(){
 /* ============================================================================
    7) SHEET (checkout)
    ========================================================================== */
-function openSheet(){ $("#sheet").classList.add("open"); $("#sheet").setAttribute("aria-hidden","false");
-  document.body.style.overflow = "hidden"; renderSheet(); }
-function closeSheet(){ $("#sheet").classList.remove("open"); $("#sheet").setAttribute("aria-hidden","true");
-  document.body.style.overflow = ""; }
+/* No iPhone, só "overflow:hidden" não segura o fundo: a página continua rolando
+   atrás do painel e volta no topo ao fechar. Travamos com position:fixed e
+   devolvemos a rolagem exatamente onde estava. */
+let scrollTravado = 0;
+function openSheet(){
+  scrollTravado = window.pageYOffset || document.documentElement.scrollTop || 0;
+  document.body.style.position = "fixed";
+  document.body.style.top = "-" + scrollTravado + "px";
+  document.body.style.left = "0";
+  document.body.style.right = "0";
+  document.body.style.overflow = "hidden";
+  $("#sheet").classList.add("open"); $("#sheet").setAttribute("aria-hidden","false");
+  renderSheet();
+}
+function closeSheet(){
+  $("#sheet").classList.remove("open"); $("#sheet").setAttribute("aria-hidden","true");
+  document.body.style.position = "";
+  document.body.style.top = "";
+  document.body.style.left = "";
+  document.body.style.right = "";
+  document.body.style.overflow = "";
+  window.scrollTo(0, scrollTravado);
+}
 
 function renderSheet(){
   const t = totals();
@@ -1048,8 +1104,12 @@ $("#btnSend").onclick = () => {
   if(!nome){ $("#cName").focus(); $("#cName").style.borderColor = "#B3453D"; return; }
   if(fone.replace(/\D/g,"").length < 10){ $("#cPhone").focus(); $("#cPhone").style.borderColor = "#B3453D"; return; }
 
-  localStorage.setItem("cli_cliente", JSON.stringify({nome, fone}));
-  localStorage.setItem("cli_last", JSON.stringify(state.sel));
+  /* No Safari em Navegação Privada o localStorage lança erro ao gravar.
+     Sem este try, o agendamento morria aqui e o WhatsApp nunca abria. */
+  try{
+    localStorage.setItem("cli_cliente", JSON.stringify({nome, fone}));
+    localStorage.setItem("cli_last", JSON.stringify(state.sel));
+  }catch(e){}
 
   const pObj = PROFS.find(p => p.id === state.prof);
   const prof = pObj ? pObj.nome : "Sem preferência";
@@ -1071,7 +1131,7 @@ $("#btnSend").onclick = () => {
   L.push(`*Total:* ${money(t.total)}`);
   L.push("", "_Agendamento feito pelo site_");
 
-  window.open(`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(L.join("\n"))}`, "_blank");
+  abrirLink(`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(L.join("\n"))}`);
 };
 
 /* ============================================================================
@@ -1106,7 +1166,13 @@ try{ const last = JSON.parse(localStorage.getItem("cli_last") || "[]").filter(id
   const ids = q.split(",").map(s => s.trim()).filter(id => byId[id]);
   if(!ids.length) return;
   ids.forEach(id => toggle(id));
-  setTimeout(() => { document.getElementById("c-"+ids[0])?.scrollIntoView({behavior:"smooth", block:"center"}); openSheet(); }, 400);
+  /* sem optional chaining: "?." é erro de sintaxe no Safari do iOS 13.3 e anteriores,
+     e derruba o site inteiro, não só esta linha */
+  setTimeout(function(){
+    const el = document.getElementById("c-" + ids[0]);
+    if(el) el.scrollIntoView({behavior:"smooth", block:"center"});
+    openSheet();
+  }, 400);
 })();
 
 /* sheet handlers */
@@ -1119,14 +1185,35 @@ document.addEventListener("keydown", e => { if(e.key === "Escape") closeSheet();
 /* PWA */
 if("serviceWorker" in navigator) addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
 let deferredPrompt = null;
-addEventListener("beforeinstallprompt", e => {
-  e.preventDefault(); deferredPrompt = e;
-  const isMobile = matchMedia("(max-width: 768px)").matches || matchMedia("(pointer: coarse)").matches;
-  if(isMobile && !localStorage.getItem("cli_pwa_no")) $("#pwaBar").classList.add("show");
-});
-$("#pwaYes").onclick = async () => { $("#pwaBar").classList.remove("show");
-  if(deferredPrompt){ deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; } };
-$("#pwaNo").onclick = () => { $("#pwaBar").classList.remove("show"); localStorage.setItem("cli_pwa_no","1"); };
+const ehIphone = /iPhone|iPod/.test(navigator.userAgent) ||
+                 (/iPad|Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+const jaInstalado = navigator.standalone === true || matchMedia("(display-mode: standalone)").matches;
+const ehMobile = matchMedia("(max-width: 768px)").matches || matchMedia("(pointer: coarse)").matches;
+
+function mostrarBarraPWA(){
+  if(!ehMobile || jaInstalado) return;
+  try{ if(localStorage.getItem("cli_pwa_no")) return; }catch(e){}
+  $("#pwaBar").classList.add("show");
+}
+
+/* Android/Chrome: existe instalação programática */
+addEventListener("beforeinstallprompt", e => { e.preventDefault(); deferredPrompt = e; mostrarBarraPWA(); });
+
+/* iPhone: beforeinstallprompt NUNCA dispara. Sem isto, a barra jamais apareceria
+   no iOS — então trocamos o texto pelo passo a passo do Safari. */
+if(ehIphone && !jaInstalado){
+  $("#pwaTxt").innerHTML = "<b>Deixe na tela de início</b><br>toque em <b>Compartilhar</b> e depois em <b>Adicionar à Tela de Início</b>.";
+  $("#pwaYes").textContent = "Entendi";
+  setTimeout(mostrarBarraPWA, 2500);
+}
+
+$("#pwaYes").onclick = async () => {
+  $("#pwaBar").classList.remove("show");
+  if(deferredPrompt){ deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; }
+  else { try{ localStorage.setItem("cli_pwa_no","1"); }catch(e){} }
+};
+$("#pwaNo").onclick = () => { $("#pwaBar").classList.remove("show");
+  try{ localStorage.setItem("cli_pwa_no","1"); }catch(e){} };
 
 /* JSON-LD BeautySalon */
 $("#ldjson").textContent = JSON.stringify({
