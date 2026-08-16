@@ -22,10 +22,13 @@ async function urlDoMes(mes) {
 }
 
 /* O blob é privado: a leitura precisa do token no cabeçalho.
-   Tentamos com token e, se falhar, sem — assim funciona nos dois modos. */
+   O parâmetro de tempo evita cópia em cache da CDN — sem ele, gravações
+   seguidas liam uma versão velha e um agendamento sobrescrevia o outro. */
 async function baixar(url) {
-  let r = await fetch(url, { headers: { authorization: `Bearer ${TOKEN()}` }, cache: "no-store" });
-  if (!r.ok) r = await fetch(url, { cache: "no-store" });
+  const semCache = url + (url.includes("?") ? "&" : "?") + "_=" + Date.now();
+  const opc = { cache: "no-store", headers: { "cache-control": "no-cache" } };
+  let r = await fetch(semCache, { ...opc, headers: { ...opc.headers, authorization: `Bearer ${TOKEN()}` } });
+  if (!r.ok) r = await fetch(semCache, opc);
   if (!r.ok) throw new Error(`falha ao ler o arquivo do mês: HTTP ${r.status}`);
   return r.json();
 }
