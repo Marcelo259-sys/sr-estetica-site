@@ -1,6 +1,6 @@
 /* Service worker simples: cache do shell + network-first no HTML.
    Ao publicar uma versão nova do site, troque o número da versão abaixo. */
-const VERSION = "clinica-v1";
+const VERSION = "clinica-v3";
 const SHELL = [
   "./",
   "./index.html",

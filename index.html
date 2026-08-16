@@ -654,6 +654,13 @@ const SERVICES = [
    basta substituir o arquivo .jpg com o mesmo nome — ou preencher foto:"..." no serviço acima.
    Se algum arquivo faltar, o card volta sozinho para o gradiente da categoria. */
 const FOTOS_DIR = "fotos/";
+/* ---- VERSÃO DAS FOTOS ----
+   As fotos ficam 1 ano no cache do navegador da cliente, para o site abrir
+   instantâneo em quem já visitou. O efeito colateral é que trocar uma imagem
+   mantendo o mesmo nome não chega em ninguém que já entrou antes.
+   SEMPRE que trocar uma foto, suba este número: ele entra na URL (?v=3) e
+   força todo mundo a baixar a nova. */
+const FOTO_V = "3";
 const FOTOS = {
   /* facial */
   "limpeza-de-pele-premium":"limpeza-pele", "limpeza-de-pele-glow":"limpeza-glow",
@@ -741,7 +748,7 @@ function ph(s){
 }
 function fotoDe(s){
   const f = FOTOS[s.id] || FOTO_PADRAO[s.cat + "|" + (s.sub || "")] || FOTO_PADRAO[s.cat];
-  return f ? FOTOS_DIR + f + ".jpg" : "";
+  return f ? FOTOS_DIR + f + ".jpg?v=" + FOTO_V : "";
 }
 const imgOf = s => s.foto || fotoDe(s) || ph(s);
 
@@ -776,7 +783,8 @@ function renderHead(){
   document.title = `${CONFIG.nome} — Estética Avançada e Depilação a Laser em ${CONFIG.cidade} | Agendamento online`;
   $("#hName").textContent = CONFIG.nome;
   $("#fName").textContent = CONFIG.nome;
-  const lg = $("h1.brandlogo img"); lg.src = CONFIG.logo; lg.alt = CONFIG.nome;
+  const lg = $("h1.brandlogo img"); lg.src = CONFIG.logo + "?v=" + FOTO_V; lg.alt = CONFIG.nome;
+  const af = $(".about-foto"); if(af) af.src = "fotos/ambiente.jpg?v=" + FOTO_V;
   $("#hSlogan").textContent = CONFIG.slogan;
   $("#fHour").textContent = horarioTexto();
   $("#fAddr").textContent = CONFIG.endereco;
@@ -790,7 +798,7 @@ function renderHead(){
   team.innerHTML = PROFS.map(p => `
     <div class="tcard">
       ${p.foto
-        ? `<img class="tav-foto" src="${p.foto}" alt="${p.nome}" loading="lazy"
+        ? `<img class="tav-foto" src="${p.foto}?v=${FOTO_V}" alt="${p.nome}" loading="lazy"
              onerror="this.outerHTML='<div class=\\'tav\\'>${p.nome[0]}</div>'">`
         : `<div class="tav">${p.nome[0]}</div>`}
       <div><b>${p.nome}</b><span>${p.papel}</span></div></div>`).join("");
