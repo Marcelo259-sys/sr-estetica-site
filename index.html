@@ -1105,6 +1105,22 @@ function fmtDataBR(iso){
   const d = new Date(iso + "T12:00:00");
   return `${DIAS[d.getDay()]}, ${String(d.getDate()).padStart(2,"0")}/${String(d.getMonth()+1).padStart(2,"0")}/${d.getFullYear()}`;
 }
+
+/* Grava o agendamento para o painel da clínica.
+   sendBeacon é feito para isto: a requisição sobrevive à saída da página, que
+   acontece logo em seguida quando abrimos o WhatsApp. Nada aqui pode impedir
+   o envio — se a gravação falhar, o agendamento segue normalmente. */
+function registrarAgendamento(dados){
+  try{
+    const corpo = JSON.stringify(dados);
+    if(navigator.sendBeacon){
+      navigator.sendBeacon("/api/agendamento", new Blob([corpo], {type:"application/json"}));
+    } else {
+      fetch("/api/agendamento", {method:"POST", headers:{"Content-Type":"application/json"},
+        body:corpo, keepalive:true}).catch(()=>{});
+    }
+  }catch(e){}
+}
 $("#btnSend").onclick = () => {
   const t = totals();
   const nome = ($("#cName").value || "").trim();
@@ -1138,6 +1154,15 @@ $("#btnSend").onclick = () => {
   if(c) L.push(`*Cupom ${state.coupon}:* -${money(t.desc)}`);
   L.push(`*Total:* ${money(t.total)}`);
   L.push("", "_Agendamento feito pelo site_");
+
+  registrarAgendamento({
+    data: state.date, hora: state.time,
+    cliente: nome, telefone: fone.replace(/\D/g,""),
+    profissional: prof,
+    servicos: t.items.map(s => ({id:s.id, nome:s.nome, preco:s.preco, min:s.min})),
+    minutos: t.minutes, subtotal: t.sub, desconto: t.desc, total: t.total,
+    cupom: state.coupon || null
+  });
 
   abrirLink(`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(L.join("\n"))}`);
 };

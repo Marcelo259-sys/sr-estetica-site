@@ -1,6 +1,6 @@
 /* Service worker simples: cache do shell + network-first no HTML.
    Ao publicar uma versão nova do site, troque o número da versão abaixo. */
-const VERSION = "clinica-v3";
+const VERSION = "clinica-v4";
 const SHELL = [
   "./",
   "./index.html",
@@ -33,6 +33,9 @@ self.addEventListener("fetch", e => {
 
   const url = new URL(req.url);
   if (url.origin !== location.origin && !url.href.includes("fonts.")) return;
+
+  // API e painel nunca entram em cache: precisam sempre do dado fresco
+  if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/painel")) return;
 
   // HTML: rede primeiro (para o cliente sempre ver preços atualizados), cache como fallback
   if (req.mode === "navigate" || (req.headers.get("accept") || "").includes("text/html")) {
