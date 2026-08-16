@@ -149,7 +149,8 @@ footer{text-align:center;font-size:11.5px;color:var(--muted);padding:26px 0 0}
 
 <script>
 const $ = (s) => document.querySelector(s);
-const money = (n) => "R$ " + (Number(n) || 0).toFixed(2).replace(".", ",");
+/* com separador de milhar: faturamento passa de mil e "R$ 6420,00" lê mal */
+const money = (n) => "R$ " + (Number(n) || 0).toLocaleString("pt-BR", {minimumFractionDigits:2, maximumFractionDigits:2});
 const dur = (m) => { const h = Math.floor(m / 60), r = m % 60;
   return h ? (r ? h + "h" + String(r).padStart(2, "0") : h + "h") : r + "min"; };
 
