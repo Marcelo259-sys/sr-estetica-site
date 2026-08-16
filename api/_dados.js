@@ -46,7 +46,7 @@ export async function gravarAgendamento(item) {
   const atuais = await lerMes(mes);
   atuais.push(item);
   await put(caminhoDoMes(mes), JSON.stringify(atuais), {
-    access: "public",
+    access: "private",
     addRandomSuffix: false,
     allowOverwrite: true,
     contentType: "application/json",
