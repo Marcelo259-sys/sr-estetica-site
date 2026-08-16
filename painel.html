@@ -6,7 +6,17 @@
 <title>Painel — SR Estética e Bem Estar</title>
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#9B1226">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<!-- App próprio: ícone e manifest separados do site, para os dois conviverem
+     na tela de início sem se confundir -->
+<link rel="manifest" href="/painel.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Painel SR">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-painel-192.png">
+<link rel="apple-touch-icon" href="/icon-painel-192.png">
+<link rel="apple-touch-icon" sizes="192x192" href="/icon-painel-192.png">
+<link rel="apple-touch-icon" sizes="512x512" href="/icon-painel-512.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -96,6 +106,18 @@ h2{font-family:"Cormorant Garamond",serif;font-size:22px;font-weight:600;margin:
 .aviso{background:#FFF6E6;border:1px solid var(--gold-l);color:#9A6414;border-radius:12px;
   padding:10px 12px;font-size:12.5px;margin-top:14px}
 footer{text-align:center;font-size:11.5px;color:var(--muted);padding:26px 0 0}
+
+/* barra de instalação do app */
+.instalar{display:flex;align-items:center;gap:11px;margin-top:16px;padding:12px 13px;
+  border-radius:16px;color:#fff;background:linear-gradient(140deg,var(--rose),var(--rose-d));
+  box-shadow:0 8px 22px rgba(155,18,38,.28)}
+.instalar .ic{width:38px;height:38px;border-radius:10px;flex:0 0 auto;display:grid;place-items:center;
+  font-family:"Cormorant Garamond",serif;font-size:17px;font-weight:700;
+  background:rgba(255,255,255,.16);box-shadow:inset 0 0 0 1px rgba(255,255,255,.28)}
+.instalar p{margin:0;flex:1;font-size:12.8px;line-height:1.35}
+.instalar .sim{background:#fff;color:var(--rose-d);border-radius:999px;padding:8px 15px;
+  font-size:12.8px;font-weight:700;white-space:nowrap}
+.instalar .nao{opacity:.6;font-size:19px;padding:0 4px;color:#fff}
 </style>
 </head>
 <body>
@@ -143,6 +165,14 @@ footer{text-align:center;font-size:11.5px;color:var(--muted);padding:26px 0 0}
     <div class="bloco" id="ranking"></div>
 
     <div class="aviso" id="avisoDados"></div>
+
+    <div class="instalar" id="barraInstalar" hidden>
+      <div class="ic">SR</div>
+      <p id="txtInstalar"><b>Instale o painel no celular</b><br>vira um app com ícone próprio, abre em 1 toque.</p>
+      <button class="sim" id="instSim">Instalar</button>
+      <button class="nao" id="instNao">×</button>
+    </div>
+
     <footer>SR Estética e Bem Estar · dados dos agendamentos feitos pelo site</footer>
   </div>
 </div>
@@ -274,6 +304,45 @@ function desenhar(d, dia){
     ? "Ainda não há agendamentos gravados. O painel se preenche sozinho conforme as clientes agendam pelo site — agendamentos combinados direto no WhatsApp não aparecem aqui."
     : "Aparecem aqui apenas os agendamentos feitos pelo site. Os combinados direto no WhatsApp não são contabilizados.";
 }
+
+/* ---------------- instalar como app ---------------- */
+/* O service worker é o que faz o Android oferecer a instalação.
+   Ele já ignora /painel e /api, então serve só para habilitar o app. */
+if("serviceWorker" in navigator){
+  addEventListener("load", () => navigator.serviceWorker.register("/sw.js").catch(()=>{}));
+}
+
+let promptInstalar = null;
+const ehIphone = /iPhone|iPod/.test(navigator.userAgent) ||
+                 (/iPad|Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+const jaInstalado = navigator.standalone === true || matchMedia("(display-mode: standalone)").matches;
+const noCelular = matchMedia("(max-width: 768px)").matches || matchMedia("(pointer: coarse)").matches;
+
+function mostrarInstalar(){
+  if(jaInstalado || !noCelular) return;
+  try{ if(localStorage.getItem("painel_inst_nao")) return; }catch(e){}
+  $("#barraInstalar").hidden = false;
+}
+
+/* Android: instalação de verdade, com um toque */
+addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); promptInstalar = e; mostrarInstalar(); });
+
+/* iPhone: não existe instalação programática — mostramos o caminho do Safari */
+if(ehIphone && !jaInstalado){
+  $("#txtInstalar").innerHTML = "<b>Deixe o painel na tela de início</b><br>toque em <b>Compartilhar</b> e depois em <b>Adicionar à Tela de Início</b>.";
+  $("#instSim").textContent = "Entendi";
+  setTimeout(mostrarInstalar, 1200);
+}
+
+$("#instSim").onclick = async () => {
+  $("#barraInstalar").hidden = true;
+  if(promptInstalar){ promptInstalar.prompt(); await promptInstalar.userChoice; promptInstalar = null; }
+  else { try{ localStorage.setItem("painel_inst_nao","1"); }catch(e){} }
+};
+$("#instNao").onclick = () => {
+  $("#barraInstalar").hidden = true;
+  try{ localStorage.setItem("painel_inst_nao","1"); }catch(e){}
+};
 
 /* já logado nesta sessão? entra direto */
 if(SENHA){

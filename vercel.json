@@ -10,7 +10,7 @@
       ]
     },
     {
-      "source": "/(logo.png|og.jpg|icon-192.png|icon-512.png)",
+      "source": "/(logo.png|og.jpg|icon-192.png|icon-512.png|icon-painel-192.png|icon-painel-512.png)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=86400, must-revalidate" }
       ]
