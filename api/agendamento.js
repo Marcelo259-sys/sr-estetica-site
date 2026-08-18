@@ -24,6 +24,9 @@ function normaliza(b) {
     desconto: num(b.desconto),
     total: num(b.total),
     cupom: b.cupom ? String(b.cupom).slice(0, 30) : null,
+    /* pagamento entra sempre pendente: quem confirma que recebeu é a
+       Simone, no painel — o site não sabe se o pagamento aconteceu */
+    pagamento: { status: "pendente", forma: null, valorPago: 0, atualizadoEm: null },
   };
 }
 

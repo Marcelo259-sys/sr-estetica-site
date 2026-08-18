@@ -77,6 +77,13 @@ h2{font-family:"Cormorant Garamond",serif;font-size:22px;font-weight:600;margin:
 .kpi b{display:block;font-family:"Cormorant Garamond",serif;font-size:30px;font-weight:700;
   color:var(--rose-d);line-height:1.1;margin-top:6px}
 .kpi small{display:block;font-size:11.5px;color:var(--muted);margin-top:2px}
+.kpi.ok b{color:var(--ok)}
+.kpi.warn b{color:#9A6414}
+
+.blabel{font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);font-weight:700}
+.blabel small{text-transform:none;letter-spacing:0;color:var(--muted);font-weight:400;font-size:11.5px}
+h3.subh{font-family:"Cormorant Garamond",serif;font-size:19px;font-weight:600;margin:22px 0 10px;color:var(--ink)}
+h3.subh small{font-family:Inter,sans-serif;font-size:12.5px;color:var(--muted);font-weight:400}
 
 /* ---------- listas ---------- */
 .bloco{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:6px 14px}
@@ -89,6 +96,19 @@ h2{font-family:"Cormorant Garamond",serif;font-size:22px;font-weight:600;margin:
 .item .c span{display:block;font-size:12.5px;color:var(--muted);line-height:1.4}
 .item .v{font-size:14px;font-weight:600;white-space:nowrap}
 .tel{color:var(--rose-d);text-decoration:none;font-size:12.5px}
+
+/* ---------- pagamento por atendimento ---------- */
+.pgto{margin-top:7px;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.pg-badge{font-size:11px;font-weight:700;letter-spacing:.02em;border-radius:999px;padding:3px 10px;white-space:nowrap}
+.pg-badge.pago{background:#E6F4EC;color:var(--ok)}
+.pg-badge.pendente{background:#FFF3DC;color:#9A6414}
+.pg-link{font-size:11.5px;color:var(--rose-d);font-weight:600;text-decoration:underline;text-underline-offset:2px}
+.pg-link[disabled]{opacity:.5}
+.pg-formas{display:none;gap:6px;margin-top:2px;flex-wrap:wrap;width:100%}
+.pg-formas.show{display:flex}
+.pg-chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;
+  font-size:11.8px;font-weight:600;color:var(--ink-2)}
+.pg-chip[disabled]{opacity:.5}
 
 .vazio{text-align:center;color:var(--muted);font-size:13.5px;padding:22px 0}
 
@@ -106,6 +126,21 @@ h2{font-family:"Cormorant Garamond",serif;font-size:22px;font-weight:600;margin:
 .barra{height:6px;border-radius:99px;background:var(--rose-l);margin-top:5px;overflow:hidden}
 .barra i{display:block;height:100%;background:linear-gradient(90deg,var(--rose),var(--rose-d))}
 .rank .q{font-size:12.5px;color:var(--muted);white-space:nowrap}
+
+/* ---------- gráficos de barra (sem lib — divs empilhadas) ---------- */
+.chart{display:flex;align-items:flex-end;gap:7px;overflow-x:auto;padding:10px 2px 2px;min-height:112px}
+.bd{display:flex;flex-direction:column;align-items:center;gap:6px;flex:0 0 auto;min-width:20px}
+.bd .col{width:16px;border-radius:4px 4px 2px 2px;overflow:hidden;
+  display:flex;flex-direction:column;background:transparent}
+.bd .col.zero{height:3px!important;background:var(--line);border-radius:2px}
+.bd .seg{width:100%}
+.bd .seg-pend{background:var(--gold-l)}
+.bd .seg-rec{background:var(--ok)}
+.bd span{font-size:10.3px;color:var(--muted);white-space:nowrap}
+.chart-legenda{display:flex;gap:16px;font-size:11.5px;color:var(--muted);padding:0 4px;margin-top:2px}
+.chart-legenda i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.chart-legenda .rec i{background:var(--ok)}
+.chart-legenda .pend i{background:var(--gold-l)}
 
 .aviso{background:#FFF6E6;border:1px solid var(--gold-l);color:#9A6414;border-radius:12px;
   padding:10px 12px;font-size:12.5px;margin-top:14px}
@@ -153,6 +188,24 @@ footer{text-align:center;font-size:11.5px;color:var(--muted);padding:26px 0 0}
       <div class="legenda">Riscado = já ocupado. Considera 30 em 30 minutos, dentro do horário de funcionamento.</div>
     </div>
 
+    <h2>Controle financeiro</h2>
+    <div class="kpis" id="kpisFin"></div>
+
+    <h3 class="subh">Faturamento por dia <small>últimos 14 dias</small></h3>
+    <div class="bloco" style="padding:14px">
+      <div class="chart" id="chartDias"></div>
+      <div class="chart-legenda"><span class="rec"><i></i>Recebido</span><span class="pend"><i></i>Pendente</span></div>
+    </div>
+
+    <h3 class="subh">Faturamento por mês <small>últimos 6 meses</small></h3>
+    <div class="bloco" style="padding:14px">
+      <div class="chart" id="chartMeses"></div>
+      <div class="chart-legenda"><span class="rec"><i></i>Recebido</span><span class="pend"><i></i>Pendente</span></div>
+    </div>
+
+    <h3 class="subh">Formas de pagamento <small>no mês</small></h3>
+    <div class="bloco" id="formas"></div>
+
     <h2>Serviços mais realizados <small style="font-size:13px;color:var(--muted);font-weight:400">no mês</small></h2>
     <div class="bloco" id="ranking"></div>
 
@@ -178,7 +231,11 @@ const mh = (m) => String(Math.floor(m/60)).padStart(2,"0") + ":" + String(m%60).
 
 function hojeSP(){ return new Date().toLocaleDateString("sv-SE", {timeZone:"America/Sao_Paulo"}); }
 
+const NOME_FORMA = {pix:"Pix", debito:"Cartão débito", credito:"Cartão crédito", dinheiro:"Dinheiro"};
+const MESES_ABREV = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
+
 let SENHA = sessionStorage.getItem("painel_senha") || "";
+let ULTIMO_RELATORIO = null;
 
 /* ---------------- login ---------------- */
 async function entrar(senha){
@@ -230,7 +287,69 @@ async function carregar(){
   }
 }
 
+/* linha de status de pagamento dentro de cada atendimento */
+function linhaPagamento(a){
+  const p = a.pagamento || {status:"pendente"};
+  if(p.status === "pago"){
+    return `<div class="pgto">
+      <span class="pg-badge pago">Pago${p.forma ? " · " + (NOME_FORMA[p.forma] || p.forma) : ""}</span>
+      <button class="pg-link" data-desfazer="${a.id}">desfazer</button>
+    </div>`;
+  }
+  return `<div class="pgto">
+    <span class="pg-badge pendente">Pendente</span>
+    <button class="pg-link" data-abrir-pgto="${a.id}">registrar pagamento</button>
+    <div class="pg-formas" data-formas="${a.id}">
+      <button class="pg-chip" data-forma="pix" data-id="${a.id}">Pix</button>
+      <button class="pg-chip" data-forma="debito" data-id="${a.id}">Débito</button>
+      <button class="pg-chip" data-forma="credito" data-id="${a.id}">Crédito</button>
+      <button class="pg-chip" data-forma="dinheiro" data-id="${a.id}">Dinheiro</button>
+    </div>
+  </div>`;
+}
+
+/* gráficos de barra — colunas empilhadas (recebido embaixo, pendente em cima),
+   altura proporcional ao maior valor da série */
+function barrasDias(serie){
+  const max = Math.max(1, ...serie.map((x) => x.total));
+  const ALT = 84;
+  return serie.map((x) => {
+    const hTotal = Math.round(x.total / max * ALT);
+    const hRec = x.total ? Math.round(x.recebido / x.total * hTotal) : 0;
+    const hPend = Math.max(0, hTotal - hRec);
+    const dd = x.dia.split("-")[2];
+    const zero = hTotal <= 0;
+    return `<div class="bd" title="${dd}: ${money(x.total)} (${money(x.recebido)} recebido)">
+      <div class="col${zero ? " zero" : ""}" style="height:${zero ? 3 : hTotal}px">
+        <div class="seg seg-pend" style="height:${hPend}px"></div>
+        <div class="seg seg-rec" style="height:${hRec}px"></div>
+      </div>
+      <span>${dd}</span>
+    </div>`;
+  }).join("");
+}
+function barrasMeses(serie){
+  const max = Math.max(1, ...serie.map((x) => x.total));
+  const ALT = 84;
+  return serie.map((x) => {
+    const hTotal = Math.round(x.total / max * ALT);
+    const hRec = x.total ? Math.round(x.recebido / x.total * hTotal) : 0;
+    const hPend = Math.max(0, hTotal - hRec);
+    const [ano, mm] = x.mes.split("-");
+    const label = MESES_ABREV[Number(mm) - 1];
+    const zero = hTotal <= 0;
+    return `<div class="bd" title="${label}/${ano}: ${money(x.total)} (${money(x.recebido)} recebido)">
+      <div class="col${zero ? " zero" : ""}" style="height:${zero ? 3 : hTotal}px">
+        <div class="seg seg-pend" style="height:${hPend}px"></div>
+        <div class="seg seg-rec" style="height:${hRec}px"></div>
+      </div>
+      <span>${label}</span>
+    </div>`;
+  }).join("");
+}
+
 function desenhar(d, dia){
+  ULTIMO_RELATORIO = d;
   const t = d.totais;
   const [a,m,dd] = dia.split("-");
   $("#subtitulo").textContent = `${dd}/${m}/${a} · mês de ${m}/${a}`;
@@ -241,6 +360,24 @@ function desenhar(d, dia){
     <div class="kpi"><span>Faturamento do mês</span><b style="font-size:24px">${money(t.faturamentoMes)}</b><small>ticket ${money(t.ticketMedioMes)}</small></div>
     <div class="kpi"><span>Livres hoje</span><b id="kpiLivres">—</b><small>horários de 30 min</small></div>`;
 
+  $("#kpisFin").innerHTML = `
+    <div class="kpi ok"><span>Recebido hoje</span><b>${money(t.recebidoDia)}</b></div>
+    <div class="kpi warn"><span>Pendente hoje</span><b>${money(t.pendenteDia)}</b></div>
+    <div class="kpi ok"><span>Recebido no mês</span><b>${money(t.recebidoMes)}</b></div>
+    <div class="kpi warn"><span>Pendente no mês</span><b>${money(t.pendenteMes)}</b></div>`;
+
+  $("#chartDias").innerHTML = barrasDias(d.serieDiaria || []);
+  $("#chartMeses").innerHTML = barrasMeses(d.serieMensal || []);
+
+  const fp = d.formasPagamento || [];
+  const topoForma = fp.length ? fp[0].total : 1;
+  $("#formas").innerHTML = fp.length ? fp.map((f,i) => `
+    <div class="rank">
+      <div class="n">${i+1}º</div>
+      <div class="b"><b>${f.nome}</b><div class="barra"><i style="width:${Math.round(f.total/topoForma*100)}%"></i></div></div>
+      <div class="q">${f.vezes}× · ${money(f.total)}</div>
+    </div>`).join("") : `<div class="vazio">Nenhum pagamento registrado neste mês ainda.</div>`;
+
   const ag = d.atendimentosDoDia;
   $("#agenda").innerHTML = ag.length ? ag.map((a) => `
     <div class="item">
@@ -249,6 +386,7 @@ function desenhar(d, dia){
         <b>${a.cliente || "sem nome"}</b>
         <span>${a.servicos.join(" · ")}</span>
         <span>${dur(a.minutos)}${a.telefone ? ` · <a class="tel" href="https://wa.me/55${a.telefone}">WhatsApp</a>` : ""}</span>
+        ${linhaPagamento(a)}
       </div>
       <div class="v">${money(a.total)}</div>
     </div>`).join("") : `<div class="vazio">Nenhum agendamento para este dia.</div>`;
@@ -287,7 +425,45 @@ function desenhar(d, dia){
 
   $("#avisoDados").textContent = t.atendimentosMes === 0
     ? "Ainda não há agendamentos gravados. O painel se preenche sozinho conforme as clientes agendam pelo site — agendamentos combinados direto no WhatsApp não aparecem aqui."
-    : "Aparecem aqui apenas os agendamentos feitos pelo site. Os combinados direto no WhatsApp não são contabilizados.";
+    : "Aparecem aqui apenas os agendamentos feitos pelo site. Os combinados direto no WhatsApp não são contabilizados. \"Recebido\"/\"Pendente\" refletem o que foi marcado manualmente em cada atendimento.";
+}
+
+/* ---------------- marcar pagamento ---------------- */
+$("#agenda").addEventListener("click", async (e) => {
+  const abrir = e.target.closest("[data-abrir-pgto]");
+  if(abrir){
+    const el = document.querySelector(`.pg-formas[data-formas="${abrir.dataset.abrirPgto}"]`);
+    if(el) el.classList.toggle("show");
+    return;
+  }
+  const chip = e.target.closest("[data-forma]");
+  if(chip){
+    chip.disabled = true;
+    await marcarPagamento(chip.dataset.id, "pago", chip.dataset.forma);
+    return;
+  }
+  const desfazer = e.target.closest("[data-desfazer]");
+  if(desfazer){
+    desfazer.disabled = true;
+    await marcarPagamento(desfazer.dataset.desfazer, "pendente", null);
+  }
+});
+
+async function marcarPagamento(id, status, forma){
+  const lista = (ULTIMO_RELATORIO && ULTIMO_RELATORIO.atendimentosDoDia) || [];
+  const item = lista.find((x) => x.id === id);
+  const valorPago = item ? item.total : 0;
+  const mes = $("#dia").value.slice(0,7);
+  try{
+    const r = await fetch(`/api/pagamento?senha=${encodeURIComponent(SENHA)}`, {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({mes, id, status, forma, valorPago})
+    });
+    if(!r.ok) throw new Error();
+    await carregar();
+  }catch(e){
+    alert("Não consegui salvar o pagamento agora. Tente de novo em instantes.");
+  }
 }
 
 /* já logado nesta sessão? entra direto */

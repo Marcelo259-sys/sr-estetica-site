@@ -58,6 +58,23 @@ export async function gravarAgendamento(item) {
   return atuais.length;
 }
 
+/* Marca um agendamento já gravado como pago (com forma) ou pendente.
+   Reescreve o arquivo do mês inteiro — mesmo padrão de gravarAgendamento. */
+export async function atualizarPagamento(mes, id, pagamento) {
+  const atuais = await lerMes(mes);
+  const idx = atuais.findIndex((a) => a.id === id);
+  if (idx === -1) throw new Error("agendamento não encontrado neste mês");
+  atuais[idx] = { ...atuais[idx], pagamento };
+  await put(caminhoDoMes(mes), JSON.stringify(atuais), {
+    access: "private",
+    addRandomSuffix: false,
+    allowOverwrite: true,
+    contentType: "application/json",
+    token: TOKEN(),
+  });
+  return atuais[idx];
+}
+
 /* Confere a senha do painel. Sem senha configurada, o painel fica fechado. */
 export function senhaOk(req) {
   const esperada = process.env.PAINEL_SENHA;
