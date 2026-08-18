@@ -430,7 +430,7 @@ function desenhar(d, dia){
 
   $("#avisoDados").textContent = t.atendimentosMes === 0
     ? "Ainda não há agendamentos gravados. O painel se preenche sozinho conforme as clientes agendam pelo site — agendamentos combinados direto no WhatsApp não aparecem aqui."
-    : "Aparecem aqui apenas os agendamentos feitos pelo site. Os combinados direto no WhatsApp não são contabilizados. \"Recebido\"/\"Pendente\" refletem o que foi marcado manualmente em cada atendimento.";
+    : "Aparecem aqui apenas os agendamentos feitos pelo site. Os combinados direto no WhatsApp não são contabilizados. \"Recebido\"/\"Pendente\" refletem o que foi marcado manualmente em cada atendimento. Um agendamento bem recente pode levar um minutinho para aparecer — se não vir na hora, aguarde e troque a data para atualizar.";
 }
 
 /* ---------------- marcar pagamento ---------------- */
@@ -457,9 +457,9 @@ $("#agenda").addEventListener("click", async (e) => {
 async function marcarPagamento(id, status, forma){
   const lista = (ULTIMO_RELATORIO && ULTIMO_RELATORIO.atendimentosDoDia) || [];
   const item = lista.find((x) => x.id === id);
-  const valorPago = item ? item.total : 0;
-  const dia = $("#dia").value || hojeSP();
-  const mes = dia.slice(0,7);
+  if(!item) return;
+  const valorPago = status === "pago" ? item.total : 0;
+  const mes = ($("#dia").value || hojeSP()).slice(0,7);
 
   const wrap = document.querySelector(`.pgto[data-pgto-de="${id}"]`);
   if(wrap) wrap.innerHTML = `<span class="pg-badge salvando">Salvando…</span>`;
@@ -470,24 +470,61 @@ async function marcarPagamento(id, status, forma){
       body: JSON.stringify({mes, id, status, forma, valorPago})
     });
     if(!r.ok) throw new Error();
+    const resp = await r.json();
 
-    /* A gravação leva alguns segundos para aparecer na leitura, mesmo com
-       parâmetro anti-cache — é o próprio armazenamento, não é cache do
-       navegador. Em vez de recarregar uma vez só e arriscar mostrar o
-       estado antigo, buscamos de novo até o item vir com o status certo. */
-    let dados = null;
-    for(let tent = 0; tent < 7; tent++){
-      dados = await buscarRelatorio(dia, mes);
-      const atual = (dados.atendimentosDoDia || []).find((x) => x.id === id);
-      const statusLido = atual && atual.pagamento && atual.pagamento.status;
-      if(statusLido === status) break;
-      await new Promise((res) => setTimeout(res, 900 + tent * 300));
-    }
-    if(dados) desenhar(dados, dia);
+    /* A leitura (GET /api/relatorio) demora a refletir uma escrita recente —
+       chegamos a medir mais de 40s de atraso. Buscar de novo e esperar não
+       é opção. A própria resposta da escrita já confirma o que foi gravado,
+       então usamos ela para atualizar a tela na hora, sem depender de uma
+       leitura nova. Trocar de dia ou reabrir o painel volta a buscar tudo
+       do servidor, já sincronizado. */
+    aplicarPagamentoLocal(id, resp.agendamento.pagamento, item);
   }catch(e){
     if(wrap) wrap.innerHTML = `<span class="pg-badge pendente">Não salvou</span>
       <button class="pg-link" data-abrir-pgto="${id}">tentar de novo</button>`;
   }
+}
+
+/* Aplica o resultado confirmado da gravação ao estado já carregado na tela
+   (item, KPIs de recebido/pendente, gráficos e ranking de formas), sem
+   precisar buscar o relatório de novo no servidor. */
+function aplicarPagamentoLocal(id, novoPagamento, item){
+  if(!ULTIMO_RELATORIO) return;
+  const antigoStatus = (item.pagamento && item.pagamento.status) || "pendente";
+  const antigaForma = item.pagamento && item.pagamento.forma;
+  const antigoValor = (item.pagamento && item.pagamento.valorPago) || 0;
+  const total = item.total;
+
+  const novoStatus = novoPagamento.status;
+  const novaForma = novoPagamento.forma;
+  const novoValor = novoPagamento.valorPago || 0;
+
+  item.pagamento = novoPagamento;
+
+  const t = ULTIMO_RELATORIO.totais;
+  const deltaRecebido = (novoStatus === "pago" ? novoValor : 0) - (antigoStatus === "pago" ? antigoValor : 0);
+  const deltaPendente = (novoStatus === "pago" ? 0 : total) - (antigoStatus === "pago" ? 0 : total);
+  t.recebidoDia += deltaRecebido; t.pendenteDia += deltaPendente;
+  t.recebidoMes += deltaRecebido; t.pendenteMes += deltaPendente;
+
+  const dia = $("#dia").value || hojeSP();
+  const mesRef = dia.slice(0,7);
+  (ULTIMO_RELATORIO.serieDiaria || []).forEach((s) => { if(s.dia === dia) s.recebido += deltaRecebido; });
+  (ULTIMO_RELATORIO.serieMensal || []).forEach((s) => { if(s.mes === mesRef) s.recebido += deltaRecebido; });
+
+  const fp = ULTIMO_RELATORIO.formasPagamento || (ULTIMO_RELATORIO.formasPagamento = []);
+  if(antigoStatus === "pago" && antigaForma){
+    const e = fp.find((f) => f.forma === antigaForma);
+    if(e){ e.vezes -= 1; e.total -= antigoValor; }
+  }
+  if(novoStatus === "pago" && novaForma){
+    let e = fp.find((f) => f.forma === novaForma);
+    if(!e){ e = {forma:novaForma, nome:NOME_FORMA[novaForma] || novaForma, vezes:0, total:0}; fp.push(e); }
+    e.vezes += 1; e.total += novoValor;
+  }
+  ULTIMO_RELATORIO.formasPagamento = fp.filter((f) => f.vezes > 0).sort((a,b) => b.total - a.total);
+
+  desenhar(ULTIMO_RELATORIO, dia);
 }
 
 /* já logado nesta sessão? entra direto */
