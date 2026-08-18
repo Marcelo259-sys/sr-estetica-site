@@ -937,6 +937,43 @@ function slotsFor(date){
   }
   return out;
 }
+/* Busca no servidor os horários já ocupados nesse dia (só hora + duração,
+   sem nome nem serviço). Falha aberta: se o pedido não voltar a tempo ou
+   der erro, devolve lista vazia — melhor mostrar um horário a mais do que
+   travar o agendamento por causa de uma falha de rede. */
+async function horariosOcupados(diaISO){
+  try{
+    const ctrl = new AbortController();
+    const alarme = setTimeout(() => ctrl.abort(), 4000);
+    const r = await fetch("/api/horarios?dia=" + diaISO, {cache:"no-store", signal:ctrl.signal});
+    clearTimeout(alarme);
+    if(!r.ok) return [];
+    const j = await r.json();
+    return Array.isArray(j.ocupados) ? j.ocupados : [];
+  }catch(e){ return []; }
+}
+
+/* remove da lista de horários candidatos os que colidem com algo já ocupado,
+   considerando a duração total do carrinho atual */
+function removerOcupados(candidatos, ocupados){
+  if(!ocupados.length) return candidatos;
+  const faixas = ocupados.map(function(o){
+    const ini = hm2min(o.hora);
+    return [ini, ini + Math.max(Number(o.minutos) || CONFIG.slotMin, CONFIG.slotMin)];
+  });
+  const duracao = Math.max(totals().minutes, CONFIG.slotMin);
+  return candidatos.filter(function(h){
+    const ini = hm2min(h), fim = ini + duracao;
+    return !faixas.some(function(f){ return ini < f[1] && fim > f[0]; });
+  });
+}
+
+/* checagem de última hora, feita só no instante de enviar */
+async function horarioAindaLivre(diaISO, horaHHMM){
+  const ocupados = await horariosOcupados(diaISO);
+  return removerOcupados([horaHHMM], ocupados).length > 0;
+}
+
 function statusNow(){
   const now = new Date(), h = CONFIG.horarios[now.getDay()];
   const cur = now.getHours()*60 + now.getMinutes();
@@ -960,6 +997,7 @@ function statusNow(){
    atrás do painel e volta no topo ao fechar. Travamos com position:fixed e
    devolvemos a rolagem exatamente onde estava. */
 let scrollTravado = 0;
+let horariosPedido = 0; // conta pedidos ao /api/horarios, pra ignorar resposta atrasada de dia já trocado
 function openSheet(){
   scrollTravado = window.pageYOffset || document.documentElement.scrollTop || 0;
   document.body.style.position = "fixed";
@@ -978,6 +1016,13 @@ function closeSheet(){
   document.body.style.right = "";
   document.body.style.overflow = "";
   window.scrollTo(0, scrollTravado);
+}
+
+function desenharSlots(sl){
+  $("#slots").innerHTML = sl.length
+    ? sl.map(h => `<button class="slot${h === state.time ? " on" : ""}" data-slot="${h}">${h}</button>`).join("")
+    : `<div class="empty" style="grid-column:1/-1">Sem horário livre para essa duração nesse dia. Escolha outro dia.</div>`;
+  $$("[data-slot]").forEach(b => b.onclick = () => { state.time = b.dataset.slot; renderSheet(); });
 }
 
 function renderSheet(){
@@ -1025,12 +1070,28 @@ function renderSheet(){
   const dObj = state.date ? new Date(state.date + "T12:00:00") : null;
   const sl = dObj ? slotsFor(dObj) : [];
   if(state.time && !sl.includes(state.time)) state.time = null;
-  $("#slots").innerHTML = sl.length
-    ? sl.map(h => `<button class="slot${h === state.time ? " on" : ""}" data-slot="${h}">${h}</button>`).join("")
-    : `<div class="empty" style="grid-column:1/-1">Sem horário livre para essa duração nesse dia. Escolha outro dia.</div>`;
-  $$("[data-slot]").forEach(b => b.onclick = () => { state.time = b.dataset.slot; renderSheet(); });
+  desenharSlots(sl);
   $("#slotNote").textContent = t.minutes
     ? `Reservamos ${dur(t.minutes)} para você — os horários já consideram essa duração.` : "";
+
+  /* Refinamento em segundo plano: a lista acima já aparece na hora, sem
+     esperar o servidor. Assim que ele responder, os horários que alguém
+     já reservou somem sozinhos — sem travar a tela nesse meio-tempo.
+     "meuPedido" evita que uma resposta atrasada de um dia antigo sobrescreva
+     a tela depois que a pessoa já trocou de dia. */
+  if(state.date && sl.length){
+    const meuPedido = ++horariosPedido;
+    horariosOcupados(state.date).then(function(ocupados){
+      if(meuPedido !== horariosPedido) return;
+      const livres = removerOcupados(sl, ocupados);
+      if(livres.length === sl.length) return;
+      if(state.time && !livres.includes(state.time)){
+        state.time = null;
+        $("#slotNote").textContent = "Esse horário acabou de ser reservado por outra pessoa — escolha outro, por favor.";
+      }
+      desenharSlots(livres);
+    });
+  }
 
   /* --- profissionais que atendem o que foi escolhido --- */
   let pool = PROFS.filter(p => t.items.some(s => (s.profs ? s.profs.includes(p.id) : p.cats.includes(s.cat))));
@@ -1121,12 +1182,26 @@ function registrarAgendamento(dados){
     }
   }catch(e){}
 }
-$("#btnSend").onclick = () => {
+$("#btnSend").onclick = async () => {
   const t = totals();
   const nome = ($("#cName").value || "").trim();
   const fone = ($("#cPhone").value || "").trim();
   if(!nome){ $("#cName").focus(); $("#cName").style.borderColor = "#B3453D"; return; }
   if(fone.replace(/\D/g,"").length < 10){ $("#cPhone").focus(); $("#cPhone").style.borderColor = "#B3453D"; return; }
+
+  /* Checagem de última hora: alguém pode ter fechado esse mesmo horário nos
+     segundos entre escolher e enviar. Falha aberta — se a checagem não
+     responder, seguimos com o envio normalmente. */
+  const btn = $("#btnSend"), textoBtn = btn.textContent;
+  btn.disabled = true; btn.textContent = "Confirmando horário…";
+  const aindaLivre = await horarioAindaLivre(state.date, state.time).catch(() => true);
+  btn.disabled = false; btn.textContent = textoBtn;
+  if(!aindaLivre){
+    state.time = null;
+    $("#slotNote").textContent = "Esse horário acabou de ser reservado por outra pessoa — escolha outro, por favor.";
+    renderSheet();
+    return;
+  }
 
   /* No Safari em Navegação Privada o localStorage lança erro ao gravar.
      Sem este try, o agendamento morria aqui e o WhatsApp nunca abria. */
