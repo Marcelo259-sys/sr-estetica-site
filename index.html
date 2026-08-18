@@ -1197,9 +1197,11 @@ $("#btnSend").onclick = async () => {
   const aindaLivre = await horarioAindaLivre(state.date, state.time).catch(() => true);
   btn.disabled = false; btn.textContent = textoBtn;
   if(!aindaLivre){
+    /* renderSheet() reescreve o #slotNote com o texto padrão — por isso o
+       aviso é definido DEPOIS de chamar renderSheet(), não antes */
     state.time = null;
-    $("#slotNote").textContent = "Esse horário acabou de ser reservado por outra pessoa — escolha outro, por favor.";
     renderSheet();
+    $("#slotNote").textContent = "Esse horário acabou de ser reservado por outra pessoa — escolha outro, por favor.";
     return;
   }
 
