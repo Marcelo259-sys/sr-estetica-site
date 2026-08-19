@@ -269,7 +269,14 @@ function fmtDataBR(iso){
   return String(d.getDate()).padStart(2,"0") + "/" + String(d.getMonth()+1).padStart(2,"0") + "/" + d.getFullYear();
 }
 function primeiroNome(nome){ return (nome || "").trim().split(/\s+/)[0] || ""; }
-function linkWhats(telefone, texto){ return `https://wa.me/55${telefone}?text=${encodeURIComponent(texto)}`; }
+/* Defesa contra "55" duplicado: se o número já vier com o DDI (13 dígitos
+   começando em 55), tiramos antes de montar o link. Cobre tanto dados
+   antigos quanto qualquer novo caso que escape da normalização na entrada. */
+function wppNumero(telefone){
+  const d = String(telefone || "").replace(/\D/g, "");
+  return (d.length >= 12 && d.slice(0,2) === "55") ? d.slice(2) : d;
+}
+function linkWhats(telefone, texto){ return `https://wa.me/55${wppNumero(telefone)}?text=${encodeURIComponent(texto)}`; }
 
 /* Mensagens sem emoji de propósito: neste mesmo projeto já vimos emoji
    quebrar (virar "�") em link de WhatsApp aberto pelo WhatsApp Desktop no
@@ -491,7 +498,7 @@ function desenhar(d, dia){
       <div class="c">
         <b>${a.cliente || "sem nome"}</b>
         <span>${a.servicos.join(" · ")}</span>
-        <span>${dur(a.minutos)}${a.telefone ? ` · <a class="tel" href="https://wa.me/55${a.telefone}">WhatsApp</a>` : ""}</span>
+        <span>${dur(a.minutos)}${a.telefone ? ` · <a class="tel" href="https://wa.me/55${wppNumero(a.telefone)}">WhatsApp</a>` : ""}</span>
         ${a.status === "cancelado"
           ? `<div class="pgto">
                <span class="pg-badge cancelado">Cancelado</span>

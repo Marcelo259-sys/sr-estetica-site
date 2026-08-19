@@ -2,6 +2,14 @@
    Chamado por navigator.sendBeacon, então precisa aceitar corpo em texto. */
 import { gravarAgendamento } from "./_dados.js";
 
+/* Se a cliente digitar o telefone já com o 55 na frente (comum — é assim
+   que o WhatsApp mostra o próprio número), guardamos SEM o 55: é o formato
+   que os links wa.me/55<numero> do painel esperam. Sem isso, o link fica
+   com "55" duplicado e não abre a conversa certa. */
+function normalizarTelefoneBR(digits) {
+  return digits.length >= 12 && digits.slice(0, 2) === "55" ? digits.slice(2) : digits;
+}
+
 function normaliza(b) {
   const servicos = Array.isArray(b.servicos) ? b.servicos : [];
   const num = (v) => (typeof v === "number" && isFinite(v) ? v : 0);
@@ -11,7 +19,7 @@ function normaliza(b) {
     data: String(b.data || "").slice(0, 10),
     hora: String(b.hora || "").slice(0, 5),
     cliente: String(b.cliente || "").slice(0, 80),
-    telefone: String(b.telefone || "").replace(/\D/g, "").slice(0, 15),
+    telefone: normalizarTelefoneBR(String(b.telefone || "").replace(/\D/g, "")).slice(0, 15),
     profissional: String(b.profissional || "").slice(0, 60),
     servicos: servicos.slice(0, 30).map((s) => ({
       id: String(s.id || "").slice(0, 60),
