@@ -103,13 +103,26 @@ h3.subh small{font-family:Inter,sans-serif;font-size:12.5px;color:var(--muted);f
 .pg-badge.pago{background:#E6F4EC;color:var(--ok)}
 .pg-badge.pendente{background:#FFF3DC;color:#9A6414}
 .pg-badge.salvando{background:#F3EDEA;color:var(--muted)}
-.pg-link{font-size:11.5px;color:var(--rose-d);font-weight:600;text-decoration:underline;text-underline-offset:2px}
+.pg-badge.cancelado{background:#F7E2E2;color:#B3453D}
+.pg-link{font-size:11.5px;color:var(--rose-d);font-weight:600;text-decoration:underline;text-underline-offset:2px;
+  background:none;border:0;padding:0}
 .pg-link[disabled]{opacity:.5}
 .pg-formas{display:none;gap:6px;margin-top:2px;flex-wrap:wrap;width:100%}
 .pg-formas.show{display:flex}
 .pg-chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;
   font-size:11.8px;font-weight:600;color:var(--ink-2)}
 .pg-chip[disabled]{opacity:.5}
+.item.cancelado{opacity:.55}
+.item.cancelado .c>b{text-decoration:line-through}
+.cancelar-link{display:block;margin-top:5px}
+
+/* ---------- central de lembretes ---------- */
+.contagem{display:inline-block;background:var(--rose);color:#fff;font-size:12px;font-weight:700;
+  border-radius:999px;padding:2px 9px;margin-left:8px;vertical-align:2px}
+.lembrete-btn{flex:0 0 auto;background:linear-gradient(140deg,var(--rose),var(--rose-d));color:#fff;
+  border-radius:999px;padding:9px 17px;font-size:12.8px;font-weight:700;text-decoration:none;
+  white-space:nowrap;box-shadow:0 4px 12px rgba(155,18,38,.22)}
+.lemb-intro{font-size:12.5px;color:var(--muted);margin:-6px 0 14px}
 
 .vazio{text-align:center;color:var(--muted);font-size:13.5px;padding:22px 0}
 
@@ -180,6 +193,20 @@ footer{text-align:center;font-size:11.5px;color:var(--muted);padding:26px 0 0}
 
     <div class="kpis" id="kpis"></div>
 
+    <div id="lembretes">
+      <h2>Central de lembretes <span class="contagem" id="lembretesTotal"></span></h2>
+      <p class="lemb-intro">Toque em "Enviar" para abrir o WhatsApp com a mensagem já pronta — você confirma o envio por lá. Assim que tocar, o lembrete some desta lista.</p>
+
+      <h3 class="subh">Confirmação de agendamento</h3>
+      <div class="bloco" id="lembConfirmacao"></div>
+
+      <h3 class="subh">Lembrete de 24 horas</h3>
+      <div class="bloco" id="lemb24h"></div>
+
+      <h3 class="subh">Lembrete de 2 horas</h3>
+      <div class="bloco" id="lemb2h"></div>
+    </div>
+
     <h2>Atendimentos do dia</h2>
     <div class="bloco" id="agenda"></div>
 
@@ -234,6 +261,45 @@ function hojeSP(){ return new Date().toLocaleDateString("sv-SE", {timeZone:"Amer
 
 const NOME_FORMA = {pix:"Pix", debito:"Cartão débito", credito:"Cartão crédito", dinheiro:"Dinheiro"};
 const MESES_ABREV = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
+const NOME_CLINICA = "SR Estética e Bem Estar";
+const URL_SITE = "https://www.sresteticaebemestar.com.br";
+
+function fmtDataBR(iso){
+  const d = new Date(iso + "T12:00:00");
+  return String(d.getDate()).padStart(2,"0") + "/" + String(d.getMonth()+1).padStart(2,"0") + "/" + d.getFullYear();
+}
+function primeiroNome(nome){ return (nome || "").trim().split(/\s+/)[0] || ""; }
+function linkWhats(telefone, texto){ return `https://wa.me/55${telefone}?text=${encodeURIComponent(texto)}`; }
+
+/* Mensagens sem emoji de propósito: neste mesmo projeto já vimos emoji
+   quebrar (virar "�") em link de WhatsApp aberto pelo WhatsApp Desktop no
+   Windows. Uso o *negrito* e _itálico_ do próprio WhatsApp no lugar. */
+function mensagemConfirmacao(a){
+  return [
+    `*Agendamento confirmado — ${NOME_CLINICA}*`, "",
+    `Olá, ${primeiroNome(a.cliente)}!`, "",
+    `*Data:* ${fmtDataBR(a.data)}`,
+    `*Horário:* ${a.hora}`,
+    `*Serviço(s):* ${a.servicos.join(", ")}`, "",
+    "Qualquer imprevisto, é só chamar por aqui.",
+  ].join("\n");
+}
+function mensagemR24h(a){
+  return [
+    `Olá, ${primeiroNome(a.cliente)}! Passando para lembrar que seu atendimento é amanhã, ${fmtDataBR(a.data)}, às ${a.hora}.`, "",
+    `*Serviço(s):* ${a.servicos.join(", ")}`, "",
+    "Podemos confirmar seu horário?",
+  ].join("\n");
+}
+function mensagemR2h(a){
+  return `Olá, ${primeiroNome(a.cliente)}! Seu atendimento é hoje às ${a.hora}. Estamos te esperando!`;
+}
+function mensagemCancelamento(a){
+  return [
+    `Olá, ${primeiroNome(a.cliente)}! Seu agendamento do dia ${fmtDataBR(a.data)} às ${a.hora} foi cancelado.`, "",
+    `Quando quiser, é só escolher um novo horário pelo nosso site: ${URL_SITE}`,
+  ].join("\n");
+}
 
 let SENHA = sessionStorage.getItem("painel_senha") || "";
 let ULTIMO_RELATORIO = null;
@@ -313,6 +379,39 @@ function linhaPagamento(a){
   </div>`;
 }
 
+/* um item pendente na central de lembretes, com o link já pronto pro WhatsApp */
+function itemLembrete(a, tipo, mensagem){
+  const url = linkWhats(a.telefone, mensagem);
+  return `<div class="item">
+    <div class="hora">${a.hora || ""}</div>
+    <div class="c">
+      <b>${a.cliente || "sem nome"}</b>
+      <span>${a.servicos.join(" · ")} · ${fmtDataBR(a.data)}</span>
+    </div>
+    <a class="lembrete-btn" target="_blank" rel="noopener" href="${url}"
+       data-lembrete-mes="${a.mes}" data-lembrete-id="${a.id}" data-lembrete-tipo="${tipo}">Enviar</a>
+  </div>`;
+}
+
+function renderLembretes(d){
+  const lp = (d && d.lembretesPendentes) || {confirmacao:[], r24h:[], r2h:[]};
+  const blocos = [
+    {id:"lembConfirmacao", lista:lp.confirmacao, tipo:"confirmacao", montar:mensagemConfirmacao, vazio:"Nenhuma confirmação pendente."},
+    {id:"lemb24h", lista:lp.r24h, tipo:"r24h", montar:mensagemR24h, vazio:"Nenhum lembrete de 24h pendente."},
+    {id:"lemb2h", lista:lp.r2h, tipo:"r2h", montar:mensagemR2h, vazio:"Nenhum lembrete de 2h pendente."},
+  ];
+  blocos.forEach((b) => {
+    const el = $("#" + b.id);
+    if(!el) return;
+    el.innerHTML = b.lista.length
+      ? b.lista.filter((a) => a.telefone).map((a) => itemLembrete(a, b.tipo, b.montar(a))).join("") || `<div class="vazio">${b.vazio}</div>`
+      : `<div class="vazio">${b.vazio}</div>`;
+  });
+  const total = lp.confirmacao.length + lp.r24h.length + lp.r2h.length;
+  const badge = $("#lembretesTotal");
+  if(badge) badge.textContent = total ? String(total) : "";
+}
+
 /* gráficos de barra — colunas empilhadas (recebido embaixo, pendente em cima),
    altura proporcional ao maior valor da série */
 function barrasDias(serie){
@@ -374,6 +473,8 @@ function desenhar(d, dia){
   $("#chartDias").innerHTML = barrasDias(d.serieDiaria || []);
   $("#chartMeses").innerHTML = barrasMeses(d.serieMensal || []);
 
+  renderLembretes(d);
+
   const fp = d.formasPagamento || [];
   const topoForma = fp.length ? fp[0].total : 1;
   $("#formas").innerHTML = fp.length ? fp.map((f,i) => `
@@ -385,13 +486,19 @@ function desenhar(d, dia){
 
   const ag = d.atendimentosDoDia;
   $("#agenda").innerHTML = ag.length ? ag.map((a) => `
-    <div class="item">
+    <div class="item${a.status === "cancelado" ? " cancelado" : ""}">
       <div class="hora">${a.hora}</div>
       <div class="c">
         <b>${a.cliente || "sem nome"}</b>
         <span>${a.servicos.join(" · ")}</span>
         <span>${dur(a.minutos)}${a.telefone ? ` · <a class="tel" href="https://wa.me/55${a.telefone}">WhatsApp</a>` : ""}</span>
-        ${linhaPagamento(a)}
+        ${a.status === "cancelado"
+          ? `<div class="pgto">
+               <span class="pg-badge cancelado">Cancelado</span>
+               ${a.telefone ? `<a class="lembrete-btn" style="padding:6px 13px;font-size:11.8px" target="_blank" rel="noopener" href="${linkWhats(a.telefone, mensagemCancelamento({cliente:a.cliente, data:dia, hora:a.hora}))}">Avisar cliente</a>` : ""}
+               <button class="pg-link" data-reabrir="${a.id}">reabrir</button>
+             </div>`
+          : linhaPagamento(a) + `<button class="pg-link cancelar-link" data-cancelar="${a.id}">cancelar agendamento</button>`}
       </div>
       <div class="v">${money(a.total)}</div>
     </div>`).join("") : `<div class="vazio">Nenhum agendamento para este dia.</div>`;
@@ -430,7 +537,7 @@ function desenhar(d, dia){
 
   $("#avisoDados").textContent = t.atendimentosMes === 0
     ? "Ainda não há agendamentos gravados. O painel se preenche sozinho conforme as clientes agendam pelo site — agendamentos combinados direto no WhatsApp não aparecem aqui."
-    : "Aparecem aqui apenas os agendamentos feitos pelo site. Os combinados direto no WhatsApp não são contabilizados. \"Recebido\"/\"Pendente\" refletem o que foi marcado manualmente em cada atendimento. Um agendamento bem recente pode levar um minutinho para aparecer — se não vir na hora, aguarde e troque a data para atualizar.";
+    : "Aparecem aqui apenas os agendamentos feitos pelo site. Os combinados direto no WhatsApp não são contabilizados. \"Recebido\"/\"Pendente\" refletem o que foi marcado manualmente em cada atendimento. Os lembretes não saem sozinhos — a central de lembretes prepara a mensagem, mas é você quem toca em enviar no WhatsApp. Um agendamento bem recente pode levar um minutinho para aparecer — se não vir na hora, aguarde e troque a data para atualizar.";
 }
 
 /* ---------------- marcar pagamento ---------------- */
@@ -451,8 +558,92 @@ $("#agenda").addEventListener("click", async (e) => {
   if(desfazer){
     desfazer.disabled = true;
     await marcarPagamento(desfazer.dataset.desfazer, "pendente", null);
+    return;
+  }
+  const cancelar = e.target.closest("[data-cancelar]");
+  if(cancelar){
+    if(!confirm("Cancelar este agendamento?\n\nIsso libera o horário para outra cliente no site. A mensagem de aviso não é enviada sozinha — depois de cancelar, aparece um botão para você mesma avisar pelo WhatsApp.")) return;
+    await mudarStatus(cancelar.dataset.cancelar, "cancelado");
+    return;
+  }
+  const reabrir = e.target.closest("[data-reabrir]");
+  if(reabrir){
+    await mudarStatus(reabrir.dataset.reabrir, "confirmado");
   }
 });
+
+/* ---------------- cancelar / reabrir agendamento ---------------- */
+async function mudarStatus(id, status){
+  const lista = (ULTIMO_RELATORIO && ULTIMO_RELATORIO.atendimentosDoDia) || [];
+  const item = lista.find((x) => x.id === id);
+  if(!item) return;
+  const mes = ($("#dia").value || hojeSP()).slice(0,7);
+  try{
+    const r = await fetch(`/api/cancelar?senha=${encodeURIComponent(SENHA)}`, {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({mes, id, status})
+    });
+    if(!r.ok) throw new Error();
+    aplicarStatusLocal(id, status, item);
+  }catch(e){
+    alert("Não consegui salvar agora. Tente de novo em instantes.");
+  }
+}
+
+/* Mesma lógica da confirmação de pagamento: usa o que a escrita confirmou
+   pra atualizar a tela na hora, sem esperar uma leitura de volta. */
+function aplicarStatusLocal(id, novoStatus, item){
+  if(!ULTIMO_RELATORIO) return;
+  const eraAtivo = item.status !== "cancelado";
+  const ficaAtivo = novoStatus !== "cancelado";
+  item.status = novoStatus;
+
+  if(eraAtivo !== ficaAtivo){
+    const t = ULTIMO_RELATORIO.totais;
+    const sinal = ficaAtivo ? 1 : -1;
+    t.atendimentosDia += sinal;
+    t.atendimentosMes += sinal;
+    t.faturamentoDia += sinal * item.total;
+    t.faturamentoMes += sinal * item.total;
+    const pago = item.pagamento && item.pagamento.status === "pago";
+    const valorPago = pago ? (item.pagamento.valorPago || item.total) : 0;
+    if(pago){ t.recebidoDia += sinal * valorPago; t.recebidoMes += sinal * valorPago; }
+    else { t.pendenteDia += sinal * item.total; t.pendenteMes += sinal * item.total; }
+
+    /* cancelou: some da fila de lembretes também — não faz sentido lembrar
+       cliente de um atendimento que não vai mais acontecer */
+    if(!ficaAtivo && ULTIMO_RELATORIO.lembretesPendentes){
+      ["confirmacao","r24h","r2h"].forEach((k) => {
+        ULTIMO_RELATORIO.lembretesPendentes[k] = ULTIMO_RELATORIO.lembretesPendentes[k].filter((x) => x.id !== id);
+      });
+    }
+  }
+
+  desenhar(ULTIMO_RELATORIO, $("#dia").value || hojeSP());
+}
+
+/* ---------------- marcar lembrete como enviado ---------------- */
+$("#lembretes").addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-lembrete-id]");
+  if(!btn) return;
+  // não impede o link de abrir o WhatsApp — só dispara a marcação em paralelo
+  marcarLembreteEnviado(btn.dataset.lembreteMes, btn.dataset.lembreteId, btn.dataset.lembreteTipo);
+  removerLembreteLocal(btn.dataset.lembreteId, btn.dataset.lembreteTipo);
+});
+
+function marcarLembreteEnviado(mes, id, tipo){
+  try{
+    const corpo = JSON.stringify({mes, id, tipo, valor:true});
+    navigator.sendBeacon(`/api/lembrete?senha=${encodeURIComponent(SENHA)}`, new Blob([corpo], {type:"application/json"}));
+  }catch(e){}
+}
+
+function removerLembreteLocal(id, tipo){
+  if(!ULTIMO_RELATORIO || !ULTIMO_RELATORIO.lembretesPendentes) return;
+  const chave = tipo === "confirmacao" ? "confirmacao" : tipo === "r24h" ? "r24h" : "r2h";
+  ULTIMO_RELATORIO.lembretesPendentes[chave] = ULTIMO_RELATORIO.lembretesPendentes[chave].filter((a) => a.id !== id);
+  renderLembretes(ULTIMO_RELATORIO);
+}
 
 async function marcarPagamento(id, status, forma){
   const lista = (ULTIMO_RELATORIO && ULTIMO_RELATORIO.atendimentosDoDia) || [];

@@ -27,6 +27,8 @@ function normaliza(b) {
     /* pagamento entra sempre pendente: quem confirma que recebeu é a
        Simone, no painel — o site não sabe se o pagamento aconteceu */
     pagamento: { status: "pendente", forma: null, valorPago: 0, atualizadoEm: null },
+    lembretes: { confirmacao: false, r24h: false, r2h: false },
+    status: "confirmado",
   };
 }
 

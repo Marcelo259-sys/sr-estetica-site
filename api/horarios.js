@@ -14,7 +14,7 @@ export default async function handler(req, res) {
 
     const doMes = await lerMes(mesDe(dia));
     const ocupados = doMes
-      .filter((a) => a.data === dia)
+      .filter((a) => a.data === dia && a.status !== "cancelado")
       .map((a) => ({ hora: a.hora, minutos: Number(a.minutos) || 30 }));
 
     return res.status(200).json({ dia, ocupados });

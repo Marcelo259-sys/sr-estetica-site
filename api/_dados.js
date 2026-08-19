@@ -58,13 +58,14 @@ export async function gravarAgendamento(item) {
   return atuais.length;
 }
 
-/* Marca um agendamento já gravado como pago (com forma) ou pendente.
-   Reescreve o arquivo do mês inteiro — mesmo padrão de gravarAgendamento. */
-export async function atualizarPagamento(mes, id, pagamento) {
+/* Reescreve um campo de um agendamento já gravado (pagamento, lembretes,
+   status...). Sempre a mesma receita: lê o mês, troca o registro, regrava
+   o arquivo inteiro. */
+async function atualizarCampo(mes, id, patch) {
   const atuais = await lerMes(mes);
   const idx = atuais.findIndex((a) => a.id === id);
   if (idx === -1) throw new Error("agendamento não encontrado neste mês");
-  atuais[idx] = { ...atuais[idx], pagamento };
+  atuais[idx] = { ...atuais[idx], ...patch };
   await put(caminhoDoMes(mes), JSON.stringify(atuais), {
     access: "private",
     addRandomSuffix: false,
@@ -73,6 +74,33 @@ export async function atualizarPagamento(mes, id, pagamento) {
     token: TOKEN(),
   });
   return atuais[idx];
+}
+
+export async function atualizarPagamento(mes, id, pagamento) {
+  return atualizarCampo(mes, id, { pagamento });
+}
+
+/* tipo: "confirmacao" | "r24h" | "r2h" — marca (ou desmarca) que aquele
+   lembrete já foi enviado, sem mexer nos outros dois */
+export async function atualizarLembrete(mes, id, tipo, valor) {
+  const atuais = await lerMes(mes);
+  const idx = atuais.findIndex((a) => a.id === id);
+  if (idx === -1) throw new Error("agendamento não encontrado neste mês");
+  const atual = atuais[idx].lembretes || { confirmacao: false, r24h: false, r2h: false };
+  atuais[idx] = { ...atuais[idx], lembretes: { ...atual, [tipo]: !!valor } };
+  await put(caminhoDoMes(mes), JSON.stringify(atuais), {
+    access: "private",
+    addRandomSuffix: false,
+    allowOverwrite: true,
+    contentType: "application/json",
+    token: TOKEN(),
+  });
+  return atuais[idx];
+}
+
+/* status: "confirmado" | "cancelado" */
+export async function atualizarStatus(mes, id, status) {
+  return atualizarCampo(mes, id, { status });
 }
 
 /* Confere a senha do painel. Sem senha configurada, o painel fica fechado. */
