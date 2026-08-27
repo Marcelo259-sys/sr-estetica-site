@@ -2,6 +2,12 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
   "trailingSlash": false,
+  "functions": {
+    "api/cron-lembretes.js": { "maxDuration": 60 }
+  },
+  "crons": [
+    { "path": "/api/cron-lembretes?segredo=748bf4aa08a38f4751524099307d09e6da7b8f3616b955c8", "schedule": "0 12 * * *" }
+  ],
   "headers": [
     {
       "source": "/fotos/(.*)",

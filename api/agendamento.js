@@ -1,6 +1,8 @@
 /* Recebe o agendamento no momento em que a cliente aperta enviar no site.
    Chamado por navigator.sendBeacon, então precisa aceitar corpo em texto. */
 import { gravarAgendamento } from "./_dados.js";
+import { mensagemConfirmacao } from "./_mensagens.js";
+import { enviarWhatsApp } from "./_wasender.js";
 
 /* Se a cliente digitar o telefone já com o 55 na frente (comum — é assim
    que o WhatsApp mostra o próprio número), guardamos SEM o 55: é o formato
@@ -52,6 +54,22 @@ export default async function handler(req, res) {
     const item = normaliza(corpo);
     if (!item.data || !item.hora || !item.servicos.length) {
       return res.status(400).json({ erro: "faltam data, hora ou serviços" });
+    }
+
+    /* confirmação automática via WhatsApp (WASender), melhor-esforço: se
+       falhar, o item.lembretes.confirmacao continua false e o /api/cron-
+       lembretes pega esse agendamento como pendente na próxima verificação
+       e tenta de novo — então isso nunca pode travar a reserva em si.
+       Marca o flag ANTES de gravar (em vez de gravar e depois regravar só
+       esse campo) para não fazer duas escritas seguidas no mesmo arquivo do
+       mês, o que já causou uma corrida de dados neste projeto. */
+    if (item.telefone && process.env.WASENDER_API_KEY) {
+      try {
+        await enviarWhatsApp(item.telefone, mensagemConfirmacao(item));
+        item.lembretes.confirmacao = true;
+      } catch (e) {
+        console.error("falha ao enviar confirmação imediata:", e);
+      }
     }
 
     const total = await gravarAgendamento(item);

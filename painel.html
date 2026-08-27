@@ -195,7 +195,7 @@ footer{text-align:center;font-size:11.5px;color:var(--muted);padding:26px 0 0}
 
     <div id="lembretes">
       <h2>Central de lembretes <span class="contagem" id="lembretesTotal"></span></h2>
-      <p class="lemb-intro">Toque em "Enviar" para abrir o WhatsApp com a mensagem já pronta — você confirma o envio por lá. Assim que tocar, o lembrete some desta lista.</p>
+      <p class="lemb-intro">A maioria desses lembretes agora sai sozinha, automaticamente. O que aparece aqui é só o que ainda não foi enviado — toque em "Enviar" para mandar na hora pelo WhatsApp, se quiser adiantar ou se algo falhou.</p>
 
       <h3 class="subh">Confirmação de agendamento</h3>
       <div class="bloco" id="lembConfirmacao"></div>
@@ -544,7 +544,7 @@ function desenhar(d, dia){
 
   $("#avisoDados").textContent = t.atendimentosMes === 0
     ? "Ainda não há agendamentos gravados. O painel se preenche sozinho conforme as clientes agendam pelo site — agendamentos combinados direto no WhatsApp não aparecem aqui."
-    : "Aparecem aqui apenas os agendamentos feitos pelo site. Os combinados direto no WhatsApp não são contabilizados. \"Recebido\"/\"Pendente\" refletem o que foi marcado manualmente em cada atendimento. Os lembretes não saem sozinhos — a central de lembretes prepara a mensagem, mas é você quem toca em enviar no WhatsApp. Um agendamento bem recente pode levar um minutinho para aparecer — se não vir na hora, aguarde e troque a data para atualizar.";
+    : "Aparecem aqui apenas os agendamentos feitos pelo site. Os combinados direto no WhatsApp não são contabilizados. \"Recebido\"/\"Pendente\" refletem o que foi marcado manualmente em cada atendimento. Os lembretes de confirmação, 24h e 2h agora saem sozinhos pelo WhatsApp; a central de lembretes mostra só o que ainda não foi enviado, para você adiantar ou reenviar se precisar. Um agendamento bem recente pode levar um minutinho para aparecer — se não vir na hora, aguarde e troque a data para atualizar.";
 }
 
 /* ---------------- marcar pagamento ---------------- */
