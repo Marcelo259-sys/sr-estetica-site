@@ -74,13 +74,18 @@ export default async function handler(req, res) {
       ...pend2h.map((a) => ({ a, tipo: "r2h", texto: mensagemR2h(a) })),
     ];
 
+    /* a "account protection" do WASender bloqueia mais de 1 mensagem a cada
+       5s (HTTP 429) — por isso a pausa entre cada envio da fila */
     const enviados = [];
     const falhas = [];
+    let precisaEsperar = false;
     for (const t of tarefas) {
       if (!t.a.telefone) {
         falhas.push({ id: t.a.id, tipo: t.tipo, erro: "sem telefone" });
         continue;
       }
+      if (precisaEsperar) await new Promise((r) => setTimeout(r, 5500));
+      precisaEsperar = true;
       try {
         await enviarWhatsApp(t.a.telefone, t.texto);
         await atualizarLembrete(t.a.__mes, t.a.id, t.tipo, true);
