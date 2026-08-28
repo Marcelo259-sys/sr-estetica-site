@@ -24,6 +24,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- categorias (CATS) e serviços (SERVICES) — mesmo catálogo do site, usado
+     no formulário de "novo agendamento" manual -->
+<script src="/servicos-dados.js"></script>
 <style>
 :root{
   --rose:#9B1226; --rose-d:#6E0A1A; --rose-l:#F8E4E7;
@@ -159,6 +162,38 @@ h3.subh small{font-family:Inter,sans-serif;font-size:12.5px;color:var(--muted);f
 .aviso{background:#FFF6E6;border:1px solid var(--gold-l);color:#9A6414;border-radius:12px;
   padding:10px 12px;font-size:12.5px;margin-top:14px}
 footer{text-align:center;font-size:11.5px;color:var(--muted);padding:26px 0 0}
+
+/* ---------- novo agendamento manual ---------- */
+.h-linha{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:26px}
+.h-linha h2{margin:0}
+.novo-btn{flex:0 0 auto;font-size:12px;font-weight:700;color:var(--rose-d);border:1px solid var(--rose-d);
+  border-radius:999px;padding:7px 14px;background:#fff}
+.novo-form{margin-top:10px;padding:14px}
+.novo-form label{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--gold);font-weight:700;margin:14px 0 6px}
+.novo-form label:first-child{margin-top:0}
+.novo-form input,.novo-form select{width:100%;border:1px solid var(--line);border-radius:10px;
+  padding:11px 12px;font-size:15px;background:#fff;color:var(--ink)}
+.novo-cats{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.novo-cats button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 13px;
+  font-size:12.5px;font-weight:600;color:var(--ink-2)}
+.novo-cats button.on{background:var(--rose);color:#fff;border-color:var(--rose)}
+.novo-servicos{max-height:260px;overflow-y:auto;border:1px solid var(--line);border-radius:12px}
+.novo-serv-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px dashed var(--line);
+  font-size:13.5px;cursor:pointer}
+.novo-serv-item:last-child{border-bottom:0}
+.novo-serv-item input{width:auto;flex:0 0 auto}
+.novo-serv-item .nm{flex:1;min-width:0}
+.novo-serv-item .pv{color:var(--muted);font-size:12px;white-space:nowrap}
+.novo-resumo{background:var(--rose-l);border-radius:12px;padding:12px 14px;margin-top:16px;font-size:13.5px}
+.novo-resumo div{display:flex;justify-content:space-between;padding:2px 0}
+.novo-resumo .tot{font-weight:700;font-size:15px;border-top:1px dashed rgba(155,18,38,.25);margin-top:6px;padding-top:8px}
+.novo-acoes{display:flex;gap:10px;margin-top:16px}
+.novo-acoes button{flex:1;border-radius:12px;padding:13px;font-weight:700;font-size:14px}
+.novo-salvar{color:#fff;background:linear-gradient(140deg,var(--rose),var(--rose-d))}
+.novo-salvar[disabled]{opacity:.6}
+.novo-cancelar{border:1px solid var(--line);background:#fff;color:var(--ink-2)}
+.novo-aviso{font-size:12.5px;color:#B3453D;margin-top:8px;min-height:16px}
 </style>
 </head>
 <body>
@@ -207,7 +242,38 @@ footer{text-align:center;font-size:11.5px;color:var(--muted);padding:26px 0 0}
       <div class="bloco" id="lemb2h"></div>
     </div>
 
-    <h2>Atendimentos do dia</h2>
+    <div class="h-linha">
+      <h2>Atendimentos do dia</h2>
+      <button class="novo-btn" id="btnNovoAg" type="button">+ Novo agendamento</button>
+    </div>
+    <div class="bloco novo-form" id="novoAgForm" hidden>
+      <label for="novoCliente">Cliente</label>
+      <input id="novoCliente" placeholder="Nome da cliente">
+
+      <label for="novoTelefone">WhatsApp <span style="text-transform:none;font-weight:400;color:var(--muted)">(opcional — sem ele não sai confirmação automática)</span></label>
+      <input id="novoTelefone" placeholder="(15) 99999-9999" inputmode="tel">
+
+      <label for="novoData">Data</label>
+      <input type="date" id="novoData">
+
+      <label>Serviços</label>
+      <div class="novo-cats" id="novoCats"></div>
+      <div class="novo-servicos" id="novoServicos"></div>
+
+      <label for="novoHora">Horário</label>
+      <select id="novoHora"><option value="">Escolha a data e os serviços primeiro</option></select>
+
+      <label for="novoDesconto">Desconto (R$, opcional)</label>
+      <input type="number" id="novoDesconto" min="0" step="0.01" placeholder="0,00">
+
+      <div class="novo-resumo" id="novoResumo"></div>
+      <div class="novo-aviso" id="novoAviso"></div>
+
+      <div class="novo-acoes">
+        <button class="novo-cancelar" id="btnNovoCancelar" type="button">Cancelar</button>
+        <button class="novo-salvar" id="btnNovoSalvar" type="button">Salvar agendamento</button>
+      </div>
+    </div>
     <div class="bloco" id="agenda"></div>
 
     <h2>Horários disponíveis</h2>
@@ -245,6 +311,7 @@ footer{text-align:center;font-size:11.5px;color:var(--muted);padding:26px 0 0}
 
 <script>
 const $ = (s) => document.querySelector(s);
+const $$ = (s) => [...document.querySelectorAll(s)];
 /* com separador de milhar: faturamento passa de mil e "R$ 6420,00" lê mal */
 const money = (n) => "R$ " + (Number(n) || 0).toLocaleString("pt-BR", {minimumFractionDigits:2, maximumFractionDigits:2});
 const dur = (m) => { const h = Math.floor(m / 60), r = m % 60;
@@ -724,6 +791,194 @@ function aplicarPagamentoLocal(id, novoPagamento, item){
 
   desenhar(ULTIMO_RELATORIO, dia);
 }
+
+/* ---------------- novo agendamento manual ---------------- */
+const novoAg = { data: "", cats: new Set(), sel: new Set() };
+
+function novoAgAbrir(){
+  $("#novoAgForm").hidden = false;
+  $("#btnNovoAg").textContent = "Fechar";
+  if(!novoAg.data) novoAg.data = $("#dia").value || hojeSP();
+  $("#novoData").value = novoAg.data;
+  novoAgRenderCats();
+  novoAgRenderServicos();
+  novoAgAtualizarHorarios();
+  novoAgResumo();
+}
+function novoAgFechar(){
+  $("#novoAgForm").hidden = true;
+  $("#btnNovoAg").textContent = "+ Novo agendamento";
+  $("#novoAviso").textContent = "";
+}
+$("#btnNovoAg").onclick = () => { $("#novoAgForm").hidden ? novoAgAbrir() : novoAgFechar(); };
+$("#btnNovoCancelar").onclick = novoAgFechar;
+
+function novoAgRenderCats(){
+  $("#novoCats").innerHTML = CATS.map((c) =>
+    `<button type="button" class="${novoAg.cats.has(c.id) ? "on" : ""}" data-cat="${c.id}">${c.tab}</button>`).join("");
+  $$("#novoCats [data-cat]").forEach((b) => b.onclick = () => {
+    novoAg.cats.has(b.dataset.cat) ? novoAg.cats.delete(b.dataset.cat) : novoAg.cats.add(b.dataset.cat);
+    novoAgRenderCats();
+    novoAgRenderServicos();
+  });
+}
+function novoAgRenderServicos(){
+  const lista = SERVICES.filter((s) => novoAg.cats.has(s.cat));
+  $("#novoServicos").innerHTML = lista.length ? lista.map((s) => `
+    <label class="novo-serv-item">
+      <input type="checkbox" data-serv="${s.id}" ${novoAg.sel.has(s.id) ? "checked" : ""}>
+      <span class="nm">${s.nome}${s.sub ? " · " + s.sub : ""}</span>
+      <span class="pv">${s.ap ? "a partir de " : ""}${money(s.preco)} · ${dur(s.min)}</span>
+    </label>`).join("") : `<div class="vazio">Escolha uma categoria acima.</div>`;
+  $$("#novoServicos [data-serv]").forEach((cb) => cb.onchange = () => {
+    cb.checked ? novoAg.sel.add(cb.dataset.serv) : novoAg.sel.delete(cb.dataset.serv);
+    novoAgAtualizarHorarios();
+    novoAgResumo();
+  });
+}
+
+function novoAgItens(){ return SERVICES.filter((s) => novoAg.sel.has(s.id)); }
+function novoAgTotais(){
+  const itens = novoAgItens();
+  const sub = itens.reduce((t,s) => t + s.preco, 0);
+  const minutos = itens.reduce((t,s) => t + s.min, 0);
+  const desconto = Math.max(0, Number($("#novoDesconto").value) || 0);
+  const total = Math.max(0, sub - desconto);
+  return {itens, sub, minutos, desconto, total};
+}
+function novoAgResumo(){
+  const t = novoAgTotais();
+  $("#novoResumo").innerHTML = `
+    <div><span>Serviços (${t.itens.length})</span><span>${money(t.sub)}</span></div>
+    ${t.desconto > 0 ? `<div><span>Desconto</span><span>-${money(t.desconto)}</span></div>` : ""}
+    <div><span>Duração</span><span>${t.itens.length ? dur(t.minutos) : "—"}</span></div>
+    <div class="tot"><span>Total</span><span>${money(t.total)}</span></div>`;
+}
+$("#novoDesconto").addEventListener("input", novoAgResumo);
+$("#novoData").addEventListener("change", () => { novoAg.data = $("#novoData").value; novoAgAtualizarHorarios(); });
+
+/* horários ocupados naquele dia — mesmo endpoint público que o site usa */
+async function horariosOcupadosPainel(diaISO){
+  try{
+    const r = await fetch("/api/horarios?dia=" + diaISO, {cache:"no-store"});
+    if(!r.ok) return [];
+    const j = await r.json();
+    return Array.isArray(j.ocupados) ? j.ocupados : [];
+  }catch(e){ return []; }
+}
+
+async function novoAgAtualizarHorarios(){
+  const sel = $("#novoHora");
+  const dataV = $("#novoData").value;
+  if(!dataV){ sel.innerHTML = `<option value="">Escolha a data</option>`; return; }
+  if(!novoAg.sel.size){ sel.innerHTML = `<option value="">Escolha ao menos um serviço</option>`; return; }
+
+  const dt = new Date(dataV + "T12:00:00");
+  const exp = HORARIOS[dt.getDay()];
+  if(!exp){ sel.innerHTML = `<option value="">Fechado neste dia</option>`; return; }
+
+  sel.innerHTML = `<option value="">Carregando horários…</option>`;
+  const ocupados = await horariosOcupadosPainel(dataV);
+  const duracao = Math.max(novoAgTotais().minutos, PASSO);
+  const faixas = ocupados.map((o) => { const ini = hm(o.hora); return [ini, ini + Math.max(Number(o.minutos) || PASSO, PASSO)]; });
+  const livres = [];
+  for(let x = hm(exp[0]); x + PASSO <= hm(exp[1]); x += PASSO){
+    const fim = x + duracao;
+    if(!faixas.some((f) => x < f[1] && fim > f[0])) livres.push(mh(x));
+  }
+  sel.innerHTML = livres.length
+    ? livres.map((h) => `<option value="${h}">${h}</option>`).join("")
+    : `<option value="">Nenhum horário livre neste dia</option>`;
+}
+
+/* checagem de última hora, feita só no instante de salvar — mesmo padrão do site */
+async function horarioAindaLivrePainel(diaISO, horaHHMM, minutos){
+  const ocupados = await horariosOcupadosPainel(diaISO);
+  const duracao = Math.max(minutos, PASSO);
+  const ini = hm(horaHHMM), fim = ini + duracao;
+  return !ocupados.some((o) => {
+    const oi = hm(o.hora), of = oi + Math.max(Number(o.minutos) || PASSO, PASSO);
+    return ini < of && fim > oi;
+  });
+}
+
+/* Injeta o agendamento recém-criado direto no estado já carregado, em vez de
+   buscar o relatório de novo — mesmo motivo do resto do painel: a escrita no
+   Blob pode levar dezenas de segundos para aparecer numa leitura nova.
+   "Clientes no mês" fica só aproximado até a próxima troca de dia/recarga. */
+function aplicarNovoAgendamentoLocal(a){
+  if(!ULTIMO_RELATORIO) return;
+  const diaAtual = $("#dia").value || hojeSP();
+  const mesAtual = diaAtual.slice(0,7);
+  if(a.data.slice(0,7) !== mesAtual) return;
+
+  const t = ULTIMO_RELATORIO.totais;
+  t.atendimentosMes += 1;
+  t.faturamentoMes += a.total;
+  t.pendenteMes += a.total;
+
+  if(a.data === diaAtual){
+    t.atendimentosDia += 1;
+    t.faturamentoDia += a.total;
+    t.pendenteDia += a.total;
+    ULTIMO_RELATORIO.atendimentosDoDia.push({
+      id:a.id, hora:a.hora, minutos:a.minutos, cliente:a.cliente, telefone:a.telefone,
+      total:a.total, servicos:a.servicos.map((s) => s.nome),
+      pagamento:a.pagamento, lembretes:a.lembretes, status:a.status,
+    });
+    ULTIMO_RELATORIO.atendimentosDoDia.sort((x,y) => (x.hora || "").localeCompare(y.hora || ""));
+  }
+
+  desenhar(ULTIMO_RELATORIO, diaAtual);
+}
+
+$("#btnNovoSalvar").onclick = async () => {
+  const cliente = $("#novoCliente").value.trim();
+  const telefoneDigits = $("#novoTelefone").value.replace(/\D/g, "");
+  const dataV = $("#novoData").value;
+  const hora = $("#novoHora").value;
+  const t = novoAgTotais();
+  const aviso = $("#novoAviso");
+  aviso.textContent = "";
+
+  if(!cliente){ aviso.textContent = "Falta o nome da cliente."; return; }
+  if(!t.itens.length){ aviso.textContent = "Escolha ao menos um serviço."; return; }
+  if(!dataV || !hora){ aviso.textContent = "Escolha data e horário."; return; }
+
+  const btn = $("#btnNovoSalvar");
+  btn.disabled = true; btn.textContent = "Confirmando horário…";
+  const aindaLivre = await horarioAindaLivrePainel(dataV, hora, t.minutos).catch(() => true);
+  if(!aindaLivre){
+    btn.disabled = false; btn.textContent = "Salvar agendamento";
+    aviso.textContent = "Esse horário acabou de ser ocupado — escolha outro.";
+    novoAgAtualizarHorarios();
+    return;
+  }
+
+  btn.textContent = "Salvando…";
+  try{
+    const r = await fetch(`/api/agendamento-manual?senha=${encodeURIComponent(SENHA)}`, {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({
+        cliente, telefone: telefoneDigits, data: dataV, hora,
+        profissional: (PROFS[0] && PROFS[0].nome) || "",
+        servicos: t.itens.map((s) => ({id:s.id, nome:s.nome, preco:s.preco, min:s.min})),
+        minutos: t.minutos, subtotal: t.sub, desconto: t.desconto, total: t.total,
+      }),
+    });
+    if(!r.ok) throw new Error();
+    const resp = await r.json();
+
+    novoAg.sel = new Set();
+    $("#novoCliente").value = ""; $("#novoTelefone").value = ""; $("#novoDesconto").value = "";
+    novoAgFechar();
+    aplicarNovoAgendamentoLocal(resp.agendamento);
+  }catch(e){
+    aviso.textContent = "Não consegui salvar agora. Tente de novo em instantes.";
+  }finally{
+    btn.disabled = false; btn.textContent = "Salvar agendamento";
+  }
+};
 
 /* já logado nesta sessão? entra direto */
 if(SENHA){
