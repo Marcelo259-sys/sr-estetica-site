@@ -319,7 +319,7 @@ const dur = (m) => { const h = Math.floor(m / 60), r = m % 60;
   return h ? (r ? h + "h" + String(r).padStart(2, "0") : h + "h") : r + "min"; };
 
 /* Horário de funcionamento — precisa bater com o do site */
-const HORARIOS = {0:null, 1:["09:00","18:00"], 2:["09:00","18:00"], 3:["09:00","18:00"],
+const HORARIOS = {0:null, 1:["13:00","18:00"], 2:["09:00","18:00"], 3:["09:00","18:00"],
                   4:["09:00","18:00"], 5:["09:00","18:00"], 6:["09:00","16:00"]};
 const PASSO = 30;
 const hm = (s) => { const [h,m] = s.split(":").map(Number); return h*60+m; };

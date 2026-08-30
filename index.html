@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>SR Estética e Bem Estar — Estética Avançada e Depilação a Laser em Tatuí | Agendamento online</title>
-<meta name="description" content="SR Estética e Bem Estar: há mais de 7 anos no Centro de Tatuí/SP com estética facial, corporal, massagens, depilação a laser e cera. Atendimento personalizado com Simone. Agende online em 1 minuto pelo WhatsApp. Seg a Sex 9h-18h, Sáb 9h-16h.">
+<meta name="description" content="SR Estética e Bem Estar: há mais de 7 anos no Centro de Tatuí/SP com estética facial, corporal, massagens, depilação a laser e cera. Atendimento personalizado com Simone. Agende online em 1 minuto pelo WhatsApp. Seg 13h-18h, Ter a Sex 9h-18h, Sáb 9h-16h.">
 <meta name="theme-color" content="#9B1226">
 <link rel="manifest" href="manifest.json">
 <!-- iPhone: o manifest.json é ignorado no "Adicionar à Tela de Início", quem manda é isto -->
@@ -349,7 +349,7 @@ input:focus{border-color:var(--rose);box-shadow:0 0 0 3px var(--rose-l)}
     <div class="facts">
       <span class="fact"><span class="dot" id="stDot"></span><span id="stTxt">Aberto agora</span></span>
       <span class="fact">Mais de 7 anos de experiência</span>
-      <span class="fact" id="fHour">Seg a Sex 9h–18h · Sáb 9h–16h</span>
+      <span class="fact" id="fHour">Seg 13h–18h · Ter a Sex 9h–18h · Sáb 9h–16h</span>
       <span class="fact" id="fAddr">Endereço</span>
     </div>
     <div class="hero-cta">
@@ -412,7 +412,7 @@ input:focus{border-color:var(--rose);box-shadow:0 0 0 3px var(--rose-l)}
 <footer>
   <div class="wrap foot-in">
     <div><h4>Endereço</h4><p id="fAddr2">—</p></div>
-    <div><h4>Horários</h4><p>Segunda a sexta: 9h às 18h<br>Sábado: 9h às 16h<br>Domingo: fechado<br><em>Feriados: horários diferenciados</em></p></div>
+    <div><h4>Horários</h4><p>Segunda: 13h às 18h<br>Terça a sexta: 9h às 18h<br>Sábado: 9h às 16h<br>Domingo: fechado<br><em>Feriados: horários diferenciados</em></p></div>
     <div><h4>Contato</h4><p id="fPhone">—</p></div>
   </div>
   <div class="copy">© <span id="yr"></span> <span id="fName">Clínica</span> · Agendamento online</div>
@@ -522,7 +522,7 @@ const CONFIG = {
   // link do botão "Como chegar" — deixe "" que eu monto pelo endereço
   mapsUrl:   "https://www.google.com/maps/search/?api=1&query=SR%20Est%C3%A9tica%20e%20Bem%20Estar%2C%20Largo%20do%20Mercado%2C%2019%20-%20Centro%2C%20Tatu%C3%AD%20-%20SP%2C%2018270-353",
   // horários por dia da semana (0=Dom … 6=Sáb). null = fechado
-  horarios: {0:null, 1:["09:00","18:00"], 2:["09:00","18:00"], 3:["09:00","18:00"],
+  horarios: {0:null, 1:["13:00","18:00"], 2:["09:00","18:00"], 3:["09:00","18:00"],
              4:["09:00","18:00"], 5:["09:00","18:00"], 6:["09:00","16:00"]},
   // feriados sem atendimento normal (AAAA-MM-DD) — horário diferenciado, confirmar no zap
   feriados: ["2026-09-07","2026-10-12","2026-11-02","2026-11-15","2026-11-20","2026-12-25","2027-01-01"],
@@ -667,7 +667,7 @@ function mapsLink(){
     encodeURIComponent(CONFIG.nome + " " + CONFIG.endereco);
 }
 function horarioTexto(){
-  return "Seg a Sex 9h–18h · Sáb 9h–16h";
+  return "Seg 13h–18h · Ter a Sex 9h–18h · Sáb 9h–16h";
 }
 function renderHead(){
   document.title = `${CONFIG.nome} — Estética Avançada e Depilação a Laser em ${CONFIG.cidade} | Agendamento online`;
