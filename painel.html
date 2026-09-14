@@ -165,7 +165,7 @@ h3.subh small{font-family:Inter,sans-serif;font-size:12.5px;color:var(--muted);f
 footer{text-align:center;font-size:11.5px;color:var(--muted);padding:26px 0 0}
 
 /* ---------- novo agendamento manual ---------- */
-.h-linha{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:26px}
+.h-linha{display:flex;align-items:center;justify-content:space-between;gap:10px 8px;margin-top:26px;flex-wrap:wrap}
 .h-linha h2{margin:0}
 .novo-btn{flex:0 0 auto;font-size:12px;font-weight:700;color:var(--rose-d);border:1px solid var(--rose-d);
   border-radius:999px;padding:7px 14px;background:#fff}
@@ -254,7 +254,10 @@ footer{text-align:center;font-size:11.5px;color:var(--muted);padding:26px 0 0}
 
     <div class="h-linha">
       <h2>Atendimentos do dia</h2>
-      <button class="novo-btn" id="btnNovoAg" type="button">+ Novo agendamento</button>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="novo-btn" id="btnImportarClientes" type="button" style="color:var(--muted);border-color:var(--line)">Importar clientes antigos</button>
+        <button class="novo-btn" id="btnNovoAg" type="button">+ Novo agendamento</button>
+      </div>
     </div>
     <div class="bloco novo-form" id="novoAgForm" hidden>
       <label class="novo-toggle" for="novoBloqueio">
@@ -468,6 +471,26 @@ $("#novoCliente").addEventListener("input", () => {
   const achado = CLIENTES.find((c) => c.nome.toLowerCase() === nome);
   if(achado && achado.telefone && !$("#novoTelefone").value.trim()) $("#novoTelefone").value = achado.telefone;
 });
+
+/* importação única (mas segura de repetir) dos clientes de agendamentos
+   antigos, de antes dessa lista existir */
+$("#btnImportarClientes").onclick = async () => {
+  if(!confirm("Importar todos os clientes que já agendaram antes para a lista de autocompletar?\n\nPode rodar mais de uma vez sem problema, nada é duplicado.")) return;
+  const btn = $("#btnImportarClientes");
+  const textoOriginal = btn.textContent;
+  btn.disabled = true; btn.textContent = "Importando…";
+  try{
+    const r = await fetch(`/api/importar-clientes?senha=${encodeURIComponent(SENHA)}`, {method:"POST"});
+    if(!r.ok) throw new Error();
+    const j = await r.json();
+    alert(`Pronto! ${j.clientesNaLista} clientes na lista, vindos de ${j.mesesVarridos} meses de agendamentos.`);
+    carregarClientes();
+  }catch(e){
+    alert("Não consegui importar agora. Tente de novo em instantes.");
+  }finally{
+    btn.disabled = false; btn.textContent = textoOriginal;
+  }
+};
 $("#dia").addEventListener("change", carregar);
 
 async function buscarRelatorio(dia, mes){
