@@ -1,17 +1,21 @@
-/* Agendamento lançado pela própria clínica no painel (cliente que ligou, foi
-   até o local, ou combinou fora do site). Mesmo formato de dados do
-   /api/agendamento (usado pelo site), mas protegido por senha — só a
-   Simone consegue lançar um agendamento manual. */
+/* Agendamento lançado pela própria clínica no painel: um atendimento real
+   (cliente que ligou, foi até o local, ou combinou fora do site) OU um
+   bloqueio de agenda para compromisso pessoal da Simone (bloqueio:true),
+   que não é um atendimento — só ocupa o horário pra ninguém agendar por
+   cima pelo site. Mesmo formato de dados do /api/agendamento (usado pelo
+   site), mas protegido por senha — só a Simone consegue lançar. */
 import { gravarAgendamento, senhaOk } from "./_dados.js";
 import { mensagemConfirmacao } from "./_mensagens.js";
 import { enviarWhatsApp } from "./_wasender.js";
+import { upsertCliente } from "./_clientes.js";
 
 function normalizarTelefoneBR(digits) {
   return digits.length >= 12 && digits.slice(0, 2) === "55" ? digits.slice(2) : digits;
 }
 
 function normaliza(b) {
-  const servicos = Array.isArray(b.servicos) ? b.servicos : [];
+  const bloqueio = !!b.bloqueio;
+  const servicos = bloqueio ? [] : Array.isArray(b.servicos) ? b.servicos : [];
   const num = (v) => (typeof v === "number" && isFinite(v) ? v : 0);
   return {
     id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
@@ -19,7 +23,7 @@ function normaliza(b) {
     data: String(b.data || "").slice(0, 10),
     hora: String(b.hora || "").slice(0, 5),
     cliente: String(b.cliente || "").slice(0, 80),
-    telefone: normalizarTelefoneBR(String(b.telefone || "").replace(/\D/g, "")).slice(0, 15),
+    telefone: bloqueio ? "" : normalizarTelefoneBR(String(b.telefone || "").replace(/\D/g, "")).slice(0, 15),
     profissional: String(b.profissional || "").slice(0, 60),
     servicos: servicos.slice(0, 30).map((s) => ({
       id: String(s.id || "").slice(0, 60),
@@ -28,14 +32,18 @@ function normaliza(b) {
       min: num(s.min),
     })),
     minutos: num(b.minutos),
-    subtotal: num(b.subtotal),
-    desconto: num(b.desconto),
-    total: num(b.total),
+    subtotal: bloqueio ? 0 : num(b.subtotal),
+    desconto: bloqueio ? 0 : num(b.desconto),
+    total: bloqueio ? 0 : num(b.total),
     cupom: null,
     pagamento: { status: "pendente", forma: null, valorPago: 0, atualizadoEm: null },
-    lembretes: { confirmacao: false, r24h: false, r2h: false },
+    /* pré-marcado como enviado: um bloqueio não tem cliente pra confirmar
+       nem lembrar de nada — isso evita que o cron de lembretes fique
+       tentando (e falhando por "sem telefone") pra sempre */
+    lembretes: { confirmacao: true, r24h: true, r2h: true },
     status: "confirmado",
     origem: "painel",
+    bloqueio,
   };
 }
 
@@ -54,13 +62,18 @@ export default async function handler(req, res) {
     if (!corpo || typeof corpo !== "object") return res.status(400).json({ erro: "corpo inválido" });
 
     const item = normaliza(corpo);
-    if (!item.data || !item.hora || !item.cliente || !item.servicos.length) {
+    if (item.bloqueio) {
+      if (!item.data || !item.hora || !item.cliente || !item.minutos) {
+        return res.status(400).json({ erro: "faltam data, hora, motivo ou duração do bloqueio" });
+      }
+    } else if (!item.data || !item.hora || !item.cliente || !item.servicos.length) {
       return res.status(400).json({ erro: "faltam cliente, data, hora ou serviços" });
     }
 
     /* mesma confirmação automática do agendamento feito pelo site — melhor-
-       esforço, nunca trava o lançamento manual se o WASender falhar */
-    if (item.telefone && process.env.WASENDER_API_KEY) {
+       esforço, nunca trava o lançamento manual se o WASender falhar. Um
+       bloqueio nunca tem telefone, então isso já fica pulado sozinho. */
+    if (!item.bloqueio && item.telefone && process.env.WASENDER_API_KEY) {
       try {
         await enviarWhatsApp(item.telefone, mensagemConfirmacao(item));
         item.lembretes.confirmacao = true;
@@ -70,6 +83,17 @@ export default async function handler(req, res) {
     }
 
     const total = await gravarAgendamento(item);
+
+    /* alimenta a agenda de clientes pro autocompletar — nunca para um
+       bloqueio, cujo "cliente" é só o motivo digitado, não uma pessoa real */
+    if (!item.bloqueio && item.cliente) {
+      try {
+        await upsertCliente(item.cliente, item.telefone);
+      } catch (e) {
+        console.error("falha ao atualizar agenda de clientes:", e);
+      }
+    }
+
     return res.status(200).json({ ok: true, agendamento: item, gravados_no_mes: total });
   } catch (e) {
     console.error("erro ao gravar agendamento manual:", e);

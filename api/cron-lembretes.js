@@ -23,7 +23,9 @@ function somaDias(diaISO, n) {
   d.setDate(d.getDate() + n);
   return d.toLocaleDateString("sv-SE");
 }
-const ativo = (a) => a.status !== "cancelado";
+/* bloqueio (compromisso pessoal da Simone) já nasce com lembretes marcados
+   como enviados, mas exclui aqui também por clareza e defesa dupla */
+const ativo = (a) => a.status !== "cancelado" && !a.bloqueio;
 
 export default async function handler(req, res) {
   const esperado = process.env.CRON_SECRET;

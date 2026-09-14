@@ -6,7 +6,9 @@ const NOME_FORMA = { pix: "Pix", debito: "Cartão débito", credito: "Cartão cr
 const statusPgtoDe = (a) => (a.pagamento && a.pagamento.status) || "pendente";
 const valorPagoDe = (a) =>
   statusPgtoDe(a) === "pago" ? Number(a.pagamento && a.pagamento.valorPago) || Number(a.total) || 0 : 0;
-const ativo = (a) => a.status !== "cancelado"; // cancelado não conta em faturamento/ranking/clientes
+/* cancelado e bloqueio (compromisso pessoal da Simone) não contam em
+   faturamento/ranking/clientes/lembretes — só ocupam o horário */
+const ativo = (a) => a.status !== "cancelado" && !a.bloqueio;
 const soma = (lista) => lista.filter(ativo).reduce((t, a) => t + (Number(a.total) || 0), 0);
 const somaRecebido = (lista) => lista.filter(ativo).reduce((t, a) => t + valorPagoDe(a), 0);
 const somaPendente = (lista) =>
@@ -174,6 +176,7 @@ export default async function handler(req, res) {
           pagamento: a.pagamento || { status: "pendente", forma: null, valorPago: 0 },
           lembretes: a.lembretes || { confirmacao: false, r24h: false, r2h: false },
           status: a.status || "confirmado",
+          bloqueio: !!a.bloqueio,
         })),
       totais: {
         atendimentosDia: doDia.filter(ativo).length,

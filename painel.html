@@ -133,6 +133,7 @@ h3.subh small{font-family:Inter,sans-serif;font-size:12.5px;color:var(--muted);f
 .slot{border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 12px;
   font-size:13.5px;font-weight:600;color:var(--ink-2)}
 .slot.ocupado{background:#F6EFEE;color:#B99;border-style:dashed;text-decoration:line-through;font-weight:400}
+.item.bloqueio-item{border-left:3px solid var(--gold);padding-left:9px}
 .legenda{font-size:12px;color:var(--muted);margin-top:10px}
 
 .rank{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px dashed var(--line)}
@@ -172,6 +173,11 @@ footer{text-align:center;font-size:11.5px;color:var(--muted);padding:26px 0 0}
 .novo-form label{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
   color:var(--gold);font-weight:700;margin:14px 0 6px}
 .novo-form label:first-child{margin-top:0}
+.novo-form label.novo-toggle{display:flex;align-items:center;gap:10px;text-transform:none;letter-spacing:0;
+  color:var(--ink-2);font-weight:600;font-size:13.5px;background:var(--rose-l);border-radius:10px;
+  padding:11px 13px;cursor:pointer;margin:0 0 14px}
+.novo-form .novo-toggle input{width:19px;height:19px;flex:0 0 auto;-webkit-appearance:checkbox;appearance:checkbox;
+  accent-color:var(--rose)}
 .novo-form input,.novo-form select{width:100%;border:1px solid var(--line);border-radius:10px;
   padding:11px 12px;font-size:15px;background:#fff;color:var(--ink)}
 .novo-cats{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
@@ -251,25 +257,50 @@ footer{text-align:center;font-size:11.5px;color:var(--muted);padding:26px 0 0}
       <button class="novo-btn" id="btnNovoAg" type="button">+ Novo agendamento</button>
     </div>
     <div class="bloco novo-form" id="novoAgForm" hidden>
-      <label for="novoCliente">Cliente</label>
-      <input id="novoCliente" placeholder="Nome da cliente">
+      <label class="novo-toggle" for="novoBloqueio">
+        <input type="checkbox" id="novoBloqueio">
+        Bloquear horário para compromisso pessoal (sem cliente)
+      </label>
 
-      <label for="novoTelefone">WhatsApp <span style="text-transform:none;font-weight:400;color:var(--muted)">(opcional — sem ele não sai confirmação automática)</span></label>
-      <input id="novoTelefone" placeholder="(15) 99999-9999" inputmode="tel">
+      <label for="novoCliente" id="novoClienteLabel">Cliente</label>
+      <input id="novoCliente" list="novoClienteList" autocomplete="off" placeholder="Nome da cliente">
+      <datalist id="novoClienteList"></datalist>
+
+      <div id="novoCampoTelefone">
+        <label for="novoTelefone">WhatsApp <span style="text-transform:none;font-weight:400;color:var(--muted)">(opcional — sem ele não sai confirmação automática)</span></label>
+        <input id="novoTelefone" placeholder="(15) 99999-9999" inputmode="tel">
+      </div>
 
       <label for="novoData">Data</label>
       <input type="date" id="novoData">
 
-      <label>Serviços</label>
-      <div class="novo-cats" id="novoCats"></div>
-      <div class="novo-servicos" id="novoServicos"></div>
+      <div id="novoCampoServicos">
+        <label>Serviços</label>
+        <div class="novo-cats" id="novoCats"></div>
+        <div class="novo-servicos" id="novoServicos"></div>
+      </div>
+
+      <div id="novoCampoDuracao" hidden>
+        <label for="novoDuracao">Duração do bloqueio</label>
+        <select id="novoDuracao">
+          <option value="30">30 minutos</option>
+          <option value="60" selected>1 hora</option>
+          <option value="90">1h30</option>
+          <option value="120">2 horas</option>
+          <option value="180">3 horas</option>
+          <option value="240">4 horas</option>
+          <option value="600">Dia inteiro</option>
+        </select>
+      </div>
 
       <label for="novoHora">Horário <span style="text-transform:none;font-weight:400;color:var(--muted)">(sem limite do horário comercial — use como precisar, mesmo antes das 9h ou depois das 17h30)</span></label>
       <input type="time" id="novoHora" step="1800">
       <div class="novo-hora-aviso" id="novoHoraAviso"></div>
 
-      <label for="novoDesconto">Desconto (R$, opcional)</label>
-      <input type="number" id="novoDesconto" min="0" step="0.01" placeholder="0,00">
+      <div id="novoCampoDesconto">
+        <label for="novoDesconto">Desconto (R$, opcional)</label>
+        <input type="number" id="novoDesconto" min="0" step="0.01" placeholder="0,00">
+      </div>
 
       <div class="novo-resumo" id="novoResumo"></div>
       <div class="novo-aviso" id="novoAviso"></div>
@@ -416,7 +447,27 @@ function abrirPainel(){
   $("#telaPainel").hidden = false;
   if(!$("#dia").value) $("#dia").value = hojeSP();
   carregar();
+  carregarClientes();
 }
+
+/* ---------------- agenda de clientes (autocompletar) ---------------- */
+let CLIENTES = [];
+async function carregarClientes(){
+  try{
+    const r = await fetch(`/api/clientes?senha=${encodeURIComponent(SENHA)}`, {cache:"no-store"});
+    if(!r.ok) return;
+    const j = await r.json();
+    CLIENTES = Array.isArray(j.clientes) ? j.clientes : [];
+    $("#novoClienteList").innerHTML = CLIENTES.map((c) => `<option value="${c.nome}">`).join("");
+  }catch(e){}
+}
+$("#novoCliente").addEventListener("input", () => {
+  if($("#novoBloqueio").checked) return;
+  const nome = $("#novoCliente").value.trim().toLowerCase();
+  if(!nome) return;
+  const achado = CLIENTES.find((c) => c.nome.toLowerCase() === nome);
+  if(achado && achado.telefone && !$("#novoTelefone").value.trim()) $("#novoTelefone").value = achado.telefone;
+});
 $("#dia").addEventListener("change", carregar);
 
 async function buscarRelatorio(dia, mes){
@@ -564,7 +615,17 @@ function desenhar(d, dia){
     </div>`).join("") : `<div class="vazio">Nenhum pagamento registrado neste mês ainda.</div>`;
 
   const ag = d.atendimentosDoDia;
-  $("#agenda").innerHTML = ag.length ? ag.map((a) => `
+  $("#agenda").innerHTML = ag.length ? ag.map((a) => a.bloqueio ? `
+    <div class="item bloqueio-item${a.status === "cancelado" ? " cancelado" : ""}">
+      <div class="hora">${a.hora}</div>
+      <div class="c">
+        <b>🔒 ${a.cliente || "Bloqueio pessoal"}</b>
+        <span>Horário bloqueado · ${dur(a.minutos)}</span>
+        ${a.status === "cancelado"
+          ? `<div class="pgto"><span class="pg-badge cancelado">Removido</span><button class="pg-link" data-reabrir="${a.id}">restaurar</button></div>`
+          : `<button class="pg-link cancelar-link" data-cancelar="${a.id}">remover bloqueio</button>`}
+      </div>
+    </div>` : `
     <div class="item${a.status === "cancelado" ? " cancelado" : ""}">
       <div class="hora">${a.hora}</div>
       <div class="c">
@@ -641,7 +702,11 @@ $("#agenda").addEventListener("click", async (e) => {
   }
   const cancelar = e.target.closest("[data-cancelar]");
   if(cancelar){
-    if(!confirm("Cancelar este agendamento?\n\nIsso libera o horário para outra cliente no site. A mensagem de aviso não é enviada sozinha — depois de cancelar, aparece um botão para você mesma avisar pelo WhatsApp.")) return;
+    const ehBloqueio = !!cancelar.closest(".bloqueio-item");
+    const msg = ehBloqueio
+      ? "Remover este bloqueio? O horário volta a ficar disponível para agendamento pelo site."
+      : "Cancelar este agendamento?\n\nIsso libera o horário para outra cliente no site. A mensagem de aviso não é enviada sozinha — depois de cancelar, aparece um botão para você mesma avisar pelo WhatsApp.";
+    if(!confirm(msg)) return;
     await mudarStatus(cancelar.dataset.cancelar, "cancelado");
     return;
   }
@@ -677,7 +742,7 @@ function aplicarStatusLocal(id, novoStatus, item){
   const ficaAtivo = novoStatus !== "cancelado";
   item.status = novoStatus;
 
-  if(eraAtivo !== ficaAtivo){
+  if(eraAtivo !== ficaAtivo && !item.bloqueio){
     const t = ULTIMO_RELATORIO.totais;
     const sinal = ficaAtivo ? 1 : -1;
     t.atendimentosDia += sinal;
@@ -807,6 +872,8 @@ function novoAgAbrir(){
   $("#novoData").value = novoAg.data;
   $("#novoHora").value = "";
   $("#novoHoraAviso").textContent = "";
+  $("#novoBloqueio").checked = false;
+  novoAgAtualizarModo();
   novoAgRenderCats();
   novoAgRenderServicos();
   novoAgResumo();
@@ -818,6 +885,23 @@ function novoAgFechar(){
 }
 $("#btnNovoAg").onclick = () => { $("#novoAgForm").hidden ? novoAgAbrir() : novoAgFechar(); };
 $("#btnNovoCancelar").onclick = novoAgFechar;
+
+/* alterna entre "agendamento normal" e "bloqueio de horário pessoal" —
+   um bloqueio não tem cliente, telefone, serviços nem desconto, só ocupa
+   o horário pra ninguém marcar por cima pelo site */
+function novoAgAtualizarModo(){
+  const bloqueio = $("#novoBloqueio").checked;
+  $("#novoClienteLabel").textContent = bloqueio ? "Motivo do bloqueio" : "Cliente";
+  $("#novoCliente").placeholder = bloqueio ? "Ex.: consulta médica, compromisso pessoal" : "Nome da cliente";
+  $("#novoCampoTelefone").hidden = bloqueio;
+  $("#novoCampoServicos").hidden = bloqueio;
+  $("#novoCampoDuracao").hidden = !bloqueio;
+  $("#novoCampoDesconto").hidden = bloqueio;
+  $("#novoResumo").hidden = bloqueio;
+  novoAgChecarHorario();
+}
+$("#novoBloqueio").addEventListener("change", novoAgAtualizarModo);
+$("#novoDuracao").addEventListener("change", novoAgChecarHorario);
 
 function novoAgRenderCats(){
   $("#novoCats").innerHTML = CATS.map((c) =>
@@ -913,8 +997,9 @@ async function novoAgChecarHorario(){
   const aviso = $("#novoHoraAviso");
   const dataV = $("#novoData").value;
   const hora = $("#novoHora").value;
-  if(!dataV || !hora || !novoAg.sel.size){ aviso.textContent = ""; return; }
-  const minutos = Math.max(novoAgTotais().minutos, PASSO);
+  const bloqueio = $("#novoBloqueio").checked;
+  if(!dataV || !hora || (!bloqueio && !novoAg.sel.size)) { aviso.textContent = ""; return; }
+  const minutos = Math.max(bloqueio ? Number($("#novoDuracao").value) || 60 : novoAgTotais().minutos, PASSO);
   const livre = await horarioAindaLivrePainel(dataV, hora, minutos).catch(() => true);
   aviso.textContent = livre ? "" : "Esse horário conflita com outro agendamento já confirmado nesse dia.";
 }
@@ -929,19 +1014,26 @@ function aplicarNovoAgendamentoLocal(a){
   const mesAtual = diaAtual.slice(0,7);
   if(a.data.slice(0,7) !== mesAtual) return;
 
+  /* bloqueio pessoal não é atendimento: não entra em faturamento nem nas
+     contagens, só ocupa o horário na lista do dia */
   const t = ULTIMO_RELATORIO.totais;
-  t.atendimentosMes += 1;
-  t.faturamentoMes += a.total;
-  t.pendenteMes += a.total;
+  if(!a.bloqueio){
+    t.atendimentosMes += 1;
+    t.faturamentoMes += a.total;
+    t.pendenteMes += a.total;
+  }
 
   if(a.data === diaAtual){
-    t.atendimentosDia += 1;
-    t.faturamentoDia += a.total;
-    t.pendenteDia += a.total;
+    if(!a.bloqueio){
+      t.atendimentosDia += 1;
+      t.faturamentoDia += a.total;
+      t.pendenteDia += a.total;
+    }
     ULTIMO_RELATORIO.atendimentosDoDia.push({
       id:a.id, hora:a.hora, minutos:a.minutos, cliente:a.cliente, telefone:a.telefone,
       total:a.total, servicos:a.servicos.map((s) => s.nome),
       pagamento:a.pagamento, lembretes:a.lembretes, status:a.status,
+      bloqueio: !!a.bloqueio,
     });
     ULTIMO_RELATORIO.atendimentosDoDia.sort((x,y) => (x.hora || "").localeCompare(y.hora || ""));
   }
@@ -950,21 +1042,36 @@ function aplicarNovoAgendamentoLocal(a){
 }
 
 $("#btnNovoSalvar").onclick = async () => {
+  const bloqueio = $("#novoBloqueio").checked;
   const cliente = $("#novoCliente").value.trim();
-  const telefoneDigits = $("#novoTelefone").value.replace(/\D/g, "");
   const dataV = $("#novoData").value;
   const hora = $("#novoHora").value;
-  const t = novoAgTotais();
   const aviso = $("#novoAviso");
   aviso.textContent = "";
 
-  if(!cliente){ aviso.textContent = "Falta o nome da cliente."; return; }
-  if(!t.itens.length){ aviso.textContent = "Escolha ao menos um serviço."; return; }
-  if(!dataV || !hora){ aviso.textContent = "Escolha data e horário."; return; }
+  let corpo, minutos;
+  if(bloqueio){
+    if(!cliente){ aviso.textContent = "Descreva o motivo do bloqueio."; return; }
+    if(!dataV || !hora){ aviso.textContent = "Escolha data e horário."; return; }
+    minutos = Number($("#novoDuracao").value) || 60;
+    corpo = { bloqueio: true, cliente, data: dataV, hora, minutos };
+  } else {
+    const t = novoAgTotais();
+    if(!cliente){ aviso.textContent = "Falta o nome da cliente."; return; }
+    if(!t.itens.length){ aviso.textContent = "Escolha ao menos um serviço."; return; }
+    if(!dataV || !hora){ aviso.textContent = "Escolha data e horário."; return; }
+    minutos = t.minutos;
+    corpo = {
+      cliente, telefone: $("#novoTelefone").value.replace(/\D/g, ""), data: dataV, hora,
+      profissional: (PROFS[0] && PROFS[0].nome) || "",
+      servicos: t.itens.map((s) => ({id:s.id, nome:s.nome, preco:novoAgPrecoEfetivo(s), min:s.min})),
+      minutos: t.minutos, subtotal: t.sub, desconto: t.desconto, total: t.total,
+    };
+  }
 
   const btn = $("#btnNovoSalvar");
   btn.disabled = true; btn.textContent = "Confirmando horário…";
-  const aindaLivre = await horarioAindaLivrePainel(dataV, hora, t.minutos).catch(() => true);
+  const aindaLivre = await horarioAindaLivrePainel(dataV, hora, minutos).catch(() => true);
   if(!aindaLivre){
     btn.disabled = false; btn.textContent = "Salvar agendamento";
     aviso.textContent = "Esse horário acabou de ser ocupado por outro agendamento — escolha outro.";
@@ -975,12 +1082,7 @@ $("#btnNovoSalvar").onclick = async () => {
   try{
     const r = await fetch(`/api/agendamento-manual?senha=${encodeURIComponent(SENHA)}`, {
       method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({
-        cliente, telefone: telefoneDigits, data: dataV, hora,
-        profissional: (PROFS[0] && PROFS[0].nome) || "",
-        servicos: t.itens.map((s) => ({id:s.id, nome:s.nome, preco:novoAgPrecoEfetivo(s), min:s.min})),
-        minutos: t.minutos, subtotal: t.sub, desconto: t.desconto, total: t.total,
-      }),
+      body: JSON.stringify(corpo),
     });
     if(!r.ok) throw new Error();
     const resp = await r.json();
@@ -990,6 +1092,7 @@ $("#btnNovoSalvar").onclick = async () => {
     $("#novoCliente").value = ""; $("#novoTelefone").value = ""; $("#novoDesconto").value = "";
     novoAgFechar();
     aplicarNovoAgendamentoLocal(resp.agendamento);
+    if(!bloqueio) carregarClientes();
   }catch(e){
     aviso.textContent = "Não consegui salvar agora. Tente de novo em instantes.";
   }finally{

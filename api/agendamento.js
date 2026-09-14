@@ -3,6 +3,7 @@
 import { gravarAgendamento } from "./_dados.js";
 import { mensagemConfirmacao } from "./_mensagens.js";
 import { enviarWhatsApp } from "./_wasender.js";
+import { upsertCliente } from "./_clientes.js";
 
 /* Se a cliente digitar o telefone já com o 55 na frente (comum — é assim
    que o WhatsApp mostra o próprio número), guardamos SEM o 55: é o formato
@@ -73,6 +74,20 @@ export default async function handler(req, res) {
     }
 
     const total = await gravarAgendamento(item);
+
+    /* alimenta a agenda de clientes pro autocompletar do painel — melhor-
+       esforço, nunca deve travar a reserva se falhar. Precisa ser esperado
+       (await) e não "solto": numa função serverless, a execução pode ser
+       congelada assim que a resposta é enviada, e uma promise pendente sem
+       await nunca chegaria a terminar. */
+    if (item.cliente) {
+      try {
+        await upsertCliente(item.cliente, item.telefone);
+      } catch (e) {
+        console.error("falha ao atualizar agenda de clientes:", e);
+      }
+    }
+
     return res.status(200).json({ ok: true, gravados_no_mes: total });
   } catch (e) {
     console.error("erro ao gravar agendamento:", e);
