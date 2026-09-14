@@ -186,6 +186,9 @@ footer{text-align:center;font-size:11.5px;color:var(--muted);padding:26px 0 0}
   width:19px;height:19px;flex:0 0 auto;accent-color:var(--rose)}
 .novo-serv-item .nm{flex:1;min-width:0}
 .novo-serv-item .pv{color:var(--muted);font-size:12px;white-space:nowrap}
+.preco-ap-input{width:60px;border:1px solid var(--line);border-radius:6px;padding:3px 5px;
+  font-size:12px;text-align:right;color:var(--ink);background:#fff;margin:0 2px}
+.novo-hora-aviso{font-size:12.5px;color:#9A6414;margin-top:6px;min-height:16px}
 .novo-resumo{background:var(--rose-l);border-radius:12px;padding:12px 14px;margin-top:16px;font-size:13.5px}
 .novo-resumo div{display:flex;justify-content:space-between;padding:2px 0}
 .novo-resumo .tot{font-weight:700;font-size:15px;border-top:1px dashed rgba(155,18,38,.25);margin-top:6px;padding-top:8px}
@@ -261,8 +264,9 @@ footer{text-align:center;font-size:11.5px;color:var(--muted);padding:26px 0 0}
       <div class="novo-cats" id="novoCats"></div>
       <div class="novo-servicos" id="novoServicos"></div>
 
-      <label for="novoHora">Horário</label>
-      <select id="novoHora"><option value="">Escolha a data e os serviços primeiro</option></select>
+      <label for="novoHora">Horário <span style="text-transform:none;font-weight:400;color:var(--muted)">(sem limite do horário comercial — use como precisar, mesmo antes das 9h ou depois das 17h30)</span></label>
+      <input type="time" id="novoHora" step="1800">
+      <div class="novo-hora-aviso" id="novoHoraAviso"></div>
 
       <label for="novoDesconto">Desconto (R$, opcional)</label>
       <input type="number" id="novoDesconto" min="0" step="0.01" placeholder="0,00">
@@ -794,16 +798,17 @@ function aplicarPagamentoLocal(id, novoPagamento, item){
 }
 
 /* ---------------- novo agendamento manual ---------------- */
-const novoAg = { data: "", cats: new Set(), sel: new Set() };
+const novoAg = { data: "", cats: new Set(), sel: new Set(), precos: new Map() };
 
 function novoAgAbrir(){
   $("#novoAgForm").hidden = false;
   $("#btnNovoAg").textContent = "Fechar";
   if(!novoAg.data) novoAg.data = $("#dia").value || hojeSP();
   $("#novoData").value = novoAg.data;
+  $("#novoHora").value = "";
+  $("#novoHoraAviso").textContent = "";
   novoAgRenderCats();
   novoAgRenderServicos();
-  novoAgAtualizarHorarios();
   novoAgResumo();
 }
 function novoAgFechar(){
@@ -823,25 +828,44 @@ function novoAgRenderCats(){
     novoAgRenderServicos();
   });
 }
+/* preço "a partir de": a Simone pode ajustar pra cima ou pra baixo conforme
+   a área/protocolo do dia — o catálogo só entra como valor inicial sugerido */
+function novoAgPrecoEfetivo(s){
+  const v = novoAg.precos.get(s.id);
+  return (typeof v === "number" && v > 0) ? v : s.preco;
+}
+
 function novoAgRenderServicos(){
   const lista = SERVICES.filter((s) => novoAg.cats.has(s.cat));
   $("#novoServicos").innerHTML = lista.length ? lista.map((s) => `
     <label class="novo-serv-item">
       <input type="checkbox" data-serv="${s.id}" ${novoAg.sel.has(s.id) ? "checked" : ""}>
       <span class="nm">${s.nome}${s.sub ? " · " + s.sub : ""}</span>
-      <span class="pv">${s.ap ? "a partir de " : ""}${money(s.preco)} · ${dur(s.min)}</span>
+      <span class="pv">${s.ap
+        ? `a partir de <input type="number" class="preco-ap-input" data-preco-serv="${s.id}" min="0" step="0.01" value="${novoAgPrecoEfetivo(s)}">`
+        : money(s.preco)} · ${dur(s.min)}</span>
     </label>`).join("") : `<div class="vazio">Escolha uma categoria acima.</div>`;
   $$("#novoServicos [data-serv]").forEach((cb) => cb.onchange = () => {
-    cb.checked ? novoAg.sel.add(cb.dataset.serv) : novoAg.sel.delete(cb.dataset.serv);
-    novoAgAtualizarHorarios();
+    if(cb.checked) novoAg.sel.add(cb.dataset.serv);
+    else { novoAg.sel.delete(cb.dataset.serv); novoAg.precos.delete(cb.dataset.serv); }
+    novoAgChecarHorario();
     novoAgResumo();
+  });
+  $$("#novoServicos [data-preco-serv]").forEach((inp) => {
+    inp.addEventListener("click", (e) => e.stopPropagation());
+    inp.addEventListener("input", () => {
+      const v = Number(inp.value);
+      if(v > 0) novoAg.precos.set(inp.dataset.precoServ, v);
+      else novoAg.precos.delete(inp.dataset.precoServ);
+      novoAgResumo();
+    });
   });
 }
 
 function novoAgItens(){ return SERVICES.filter((s) => novoAg.sel.has(s.id)); }
 function novoAgTotais(){
   const itens = novoAgItens();
-  const sub = itens.reduce((t,s) => t + s.preco, 0);
+  const sub = itens.reduce((t,s) => t + novoAgPrecoEfetivo(s), 0);
   const minutos = itens.reduce((t,s) => t + s.min, 0);
   const desconto = Math.max(0, Number($("#novoDesconto").value) || 0);
   const total = Math.max(0, sub - desconto);
@@ -856,7 +880,8 @@ function novoAgResumo(){
     <div class="tot"><span>Total</span><span>${money(t.total)}</span></div>`;
 }
 $("#novoDesconto").addEventListener("input", novoAgResumo);
-$("#novoData").addEventListener("change", () => { novoAg.data = $("#novoData").value; novoAgAtualizarHorarios(); });
+$("#novoData").addEventListener("change", () => { novoAg.data = $("#novoData").value; novoAgChecarHorario(); });
+$("#novoHora").addEventListener("change", novoAgChecarHorario);
 
 /* horários ocupados naquele dia — mesmo endpoint público que o site usa */
 async function horariosOcupadosPainel(diaISO){
@@ -868,31 +893,10 @@ async function horariosOcupadosPainel(diaISO){
   }catch(e){ return []; }
 }
 
-async function novoAgAtualizarHorarios(){
-  const sel = $("#novoHora");
-  const dataV = $("#novoData").value;
-  if(!dataV){ sel.innerHTML = `<option value="">Escolha a data</option>`; return; }
-  if(!novoAg.sel.size){ sel.innerHTML = `<option value="">Escolha ao menos um serviço</option>`; return; }
-
-  const dt = new Date(dataV + "T12:00:00");
-  const exp = HORARIOS[dt.getDay()];
-  if(!exp){ sel.innerHTML = `<option value="">Fechado neste dia</option>`; return; }
-
-  sel.innerHTML = `<option value="">Carregando horários…</option>`;
-  const ocupados = await horariosOcupadosPainel(dataV);
-  const duracao = Math.max(novoAgTotais().minutos, PASSO);
-  const faixas = ocupados.map((o) => { const ini = hm(o.hora); return [ini, ini + Math.max(Number(o.minutos) || PASSO, PASSO)]; });
-  const livres = [];
-  for(let x = hm(exp[0]); x + PASSO <= hm(exp[1]); x += PASSO){
-    const fim = x + duracao;
-    if(!faixas.some((f) => x < f[1] && fim > f[0])) livres.push(mh(x));
-  }
-  sel.innerHTML = livres.length
-    ? livres.map((h) => `<option value="${h}">${h}</option>`).join("")
-    : `<option value="">Nenhum horário livre neste dia</option>`;
-}
-
-/* checagem de última hora, feita só no instante de salvar — mesmo padrão do site */
+/* checagem de última hora, feita só no instante de salvar — mesmo padrão do
+   site, mas SEM olhar a grade de horário comercial: aqui é a Simone lançando
+   manualmente, então antes das 9h e depois das 17h30 tem que ser permitido.
+   Só bloqueia se bater em cima de outro agendamento já confirmado. */
 async function horarioAindaLivrePainel(diaISO, horaHHMM, minutos){
   const ocupados = await horariosOcupadosPainel(diaISO);
   const duracao = Math.max(minutos, PASSO);
@@ -901,6 +905,18 @@ async function horarioAindaLivrePainel(diaISO, horaHHMM, minutos){
     const oi = hm(o.hora), of = oi + Math.max(Number(o.minutos) || PASSO, PASSO);
     return ini < of && fim > oi;
   });
+}
+
+/* aviso só informativo, enquanto ela ainda está escolhendo — o bloqueio de
+   verdade acontece de novo no clique de salvar, contra dado mais fresco */
+async function novoAgChecarHorario(){
+  const aviso = $("#novoHoraAviso");
+  const dataV = $("#novoData").value;
+  const hora = $("#novoHora").value;
+  if(!dataV || !hora || !novoAg.sel.size){ aviso.textContent = ""; return; }
+  const minutos = Math.max(novoAgTotais().minutos, PASSO);
+  const livre = await horarioAindaLivrePainel(dataV, hora, minutos).catch(() => true);
+  aviso.textContent = livre ? "" : "Esse horário conflita com outro agendamento já confirmado nesse dia.";
 }
 
 /* Injeta o agendamento recém-criado direto no estado já carregado, em vez de
@@ -951,8 +967,7 @@ $("#btnNovoSalvar").onclick = async () => {
   const aindaLivre = await horarioAindaLivrePainel(dataV, hora, t.minutos).catch(() => true);
   if(!aindaLivre){
     btn.disabled = false; btn.textContent = "Salvar agendamento";
-    aviso.textContent = "Esse horário acabou de ser ocupado — escolha outro.";
-    novoAgAtualizarHorarios();
+    aviso.textContent = "Esse horário acabou de ser ocupado por outro agendamento — escolha outro.";
     return;
   }
 
@@ -963,7 +978,7 @@ $("#btnNovoSalvar").onclick = async () => {
       body: JSON.stringify({
         cliente, telefone: telefoneDigits, data: dataV, hora,
         profissional: (PROFS[0] && PROFS[0].nome) || "",
-        servicos: t.itens.map((s) => ({id:s.id, nome:s.nome, preco:s.preco, min:s.min})),
+        servicos: t.itens.map((s) => ({id:s.id, nome:s.nome, preco:novoAgPrecoEfetivo(s), min:s.min})),
         minutos: t.minutos, subtotal: t.sub, desconto: t.desconto, total: t.total,
       }),
     });
@@ -971,6 +986,7 @@ $("#btnNovoSalvar").onclick = async () => {
     const resp = await r.json();
 
     novoAg.sel = new Set();
+    novoAg.precos = new Map();
     $("#novoCliente").value = ""; $("#novoTelefone").value = ""; $("#novoDesconto").value = "";
     novoAgFechar();
     aplicarNovoAgendamentoLocal(resp.agendamento);
