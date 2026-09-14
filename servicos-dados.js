@@ -66,6 +66,7 @@ const SERVICES = [
 /* ---------------- LASER — FEMININO ---------------- */
 {id:"laser-buco",cat:"laser",sub:"Feminina",nome:"Laser buço",min:20,preco:50,desc:"Sessão rápida e praticamente indolor no buço.",foto:""},
 {id:"laser-queixo-buco",cat:"laser",sub:"Feminina",nome:"Laser queixo + buço",min:30,preco:85,desc:"Combo de face inferior com economia na sessão.",foto:""},
+{id:"laser-rosto",cat:"laser",sub:"Feminina",nome:"Laser rosto",min:35,preco:100,desc:"Buço, queixo e laterais do rosto, com resultado progressivo a cada sessão.",foto:""},
 {id:"laser-axilas",cat:"laser",sub:"Feminina",nome:"Laser axilas",min:25,preco:80,desc:"Adeus lâmina: pele lisa e sem manchas por atrito.",foto:""},
 {id:"laser-faixa-umbigo",cat:"laser",sub:"Feminina",nome:"Laser faixa do umbigo",min:15,preco:25,desc:"Linha alba tratada em poucos minutos.",foto:""},
 {id:"laser-gluteos",cat:"laser",sub:"Feminina",nome:"Laser glúteos",min:25,preco:70,desc:"Remoção dos pelos da região glútea com conforto.",foto:""},
