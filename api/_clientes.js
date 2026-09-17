@@ -7,19 +7,21 @@
    de verdade (pagamento/status/lembretes): se uma escrita rara for perdida
    por uma corrida, o pior caso é a Simone digitar o telefone de novo uma
    vez — não afeta nenhum agendamento real. */
-import { put, list } from "@vercel/blob";
+import { put } from "@vercel/blob";
 
 const CAMINHO = "agendamentos/_clientes.json";
 const TOKEN = () => process.env.BLOB_READ_WRITE_TOKEN;
 
-async function urlDoArquivo() {
-  const { blobs } = await list({ prefix: CAMINHO, token: TOKEN() });
-  const alvo = blobs.find((b) => b.pathname === CAMINHO);
-  return alvo ? alvo.downloadUrl || alvo.url : null;
+/* URL construída direto (sem list()) — mesmo motivo de _dados.js: list()
+   é "operação avançada" no Vercel Blob, com cota bem mais apertada, e foi
+   o que estourou o limite do plano Hobby e suspendeu a loja inteira. */
+function urlDoArquivo() {
+  const storeId = String(process.env.BLOB_STORE_ID || "").replace(/^store_/, "");
+  return storeId ? `https://${storeId}.public.blob.vercel-storage.com/${CAMINHO}` : null;
 }
 
 export async function lerClientes() {
-  const url = await urlDoArquivo();
+  const url = urlDoArquivo();
   if (!url) return [];
   try {
     const semCache = url + (url.includes("?") ? "&" : "?") + "_=" + Date.now();

@@ -1,7 +1,7 @@
 /* Camada de acesso aos agendamentos.
    Guardamos um arquivo JSON por mês no Vercel Blob: agendamentos/AAAA-MM.json
    Um arquivo por mês (e não por agendamento) para o painel ler tudo de uma vez. */
-import { put, list } from "@vercel/blob";
+import { put } from "@vercel/blob";
 
 const PASTA = "agendamentos";
 const TOKEN = () => process.env.BLOB_READ_WRITE_TOKEN;
@@ -14,11 +14,18 @@ export function caminhoDoMes(mes) {
   return `${PASTA}/${mes}.json`;
 }
 
-/* Descobre a URL do arquivo do mês, se ele já existir. */
-async function urlDoMes(mes) {
-  const { blobs } = await list({ prefix: caminhoDoMes(mes), token: TOKEN() });
-  const alvo = blobs.find((b) => b.pathname === caminhoDoMes(mes));
-  return alvo ? alvo.downloadUrl || alvo.url : null;
+/* Monta a URL do arquivo direto, sem perguntar pro Blob se ele existe.
+   Como sempre gravamos com addRandomSuffix:false, a URL de cada mês é
+   sempre a mesma (store + caminho) — não precisa descobrir com list().
+   Isso importa de verdade: list() conta como "operação avançada" na cota
+   do Vercel Blob (bem mais apertada que a de leitura simples), e o painel
+   consulta vários meses por carregamento — a maioria vazios, de antes do
+   site existir. Foi exatamente isso que estourou a cota do plano Hobby e
+   suspendeu a loja inteira. Sem list(), um mês sem arquivo ainda nenhum
+   simplesmente dá 404 no fetch (tratado abaixo), sem gastar cota nenhuma. */
+function urlDoMes(mes) {
+  const storeId = String(process.env.BLOB_STORE_ID || "").replace(/^store_/, "");
+  return storeId ? `https://${storeId}.public.blob.vercel-storage.com/${caminhoDoMes(mes)}` : null;
 }
 
 /* O blob é privado: a leitura precisa do token no cabeçalho.
@@ -35,7 +42,7 @@ async function baixar(url) {
 }
 
 export async function lerMes(mes) {
-  const url = await urlDoMes(mes);
+  const url = urlDoMes(mes);
   if (!url) return [];
   try {
     const dados = await baixar(url);
