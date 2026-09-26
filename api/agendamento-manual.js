@@ -37,10 +37,13 @@ function normaliza(b) {
     total: bloqueio ? 0 : num(b.total),
     cupom: null,
     pagamento: { status: "pendente", forma: null, valorPago: 0, atualizadoEm: null },
-    /* pré-marcado como enviado: um bloqueio não tem cliente pra confirmar
-       nem lembrar de nada — isso evita que o cron de lembretes fique
-       tentando (e falhando por "sem telefone") pra sempre */
-    lembretes: { confirmacao: true, r24h: true, r2h: true },
+    /* só o bloqueio nasce com tudo marcado como enviado: ele não tem cliente
+       pra confirmar nem lembrar, e isso evita o cron tentar (e falhar por
+       "sem telefone") pra sempre. Um atendimento real nasce com tudo
+       pendente, igual ao do site — senão os lembretes de 24h e 2h nunca saem. */
+    lembretes: bloqueio
+      ? { confirmacao: true, r24h: true, r2h: true }
+      : { confirmacao: false, r24h: false, r2h: false },
     status: "confirmado",
     origem: "painel",
     bloqueio,
