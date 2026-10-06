@@ -3,7 +3,7 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "functions": {
-    "api/cron-lembretes.js": { "maxDuration": 60 },
+    "api/cron-lembretes.js": { "maxDuration": 280 },
     "api/importar-clientes.js": { "maxDuration": 60 }
   },
   "crons": [
