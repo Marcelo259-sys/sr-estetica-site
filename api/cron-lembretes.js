@@ -78,21 +78,21 @@ export default async function handler(req, res) {
 
     /* A conta do WASender em uso agora (período de teste) só permite 1
        mensagem por minuto — bem mais restrito que o limite anterior (1 a
-       cada 5s). Por isso a pausa é maior, e por isso também o limite de
-       tempo de execução desta função foi aumentado no vercel.json: com
-       esse espaçamento, poucas mensagens já ocupam bastante tempo.
-       Se a fila for grande demais pra caber no tempo disponível, o que
-       sobrar fica pendente e é pego sozinho na próxima verificação (não
-       fica marcado como enviado até o envio realmente funcionar). */
+       cada 5s). Com esse espaçamento, tentar caber uma fila grande numa
+       execução só estourou o tempo máximo da função mesmo com folga (erro
+       FUNCTION_INVOCATION_TIMEOUT). Em vez de arriscar isso de novo, cada
+       execução manda no máximo umas poucas mensagens; o que sobrar fica
+       pendente (nunca é marcado como enviado até o envio realmente
+       funcionar) e é pego sozinho na verificação seguinte, que roda a
+       cada 15 minutos. */
     const ESPACAMENTO_MS = 62000;
-    const LIMITE_EXECUCAO_MS = 260000; // deixa folga antes do maxDuration
-    const inicio = Date.now();
+    const MAX_ENVIOS_POR_EXECUCAO = 2;
     const enviados = [];
     const falhas = [];
     let precisaEsperar = false;
     for (const t of tarefas) {
-      if (Date.now() - inicio > LIMITE_EXECUCAO_MS) {
-        falhas.push({ id: t.a.id, tipo: t.tipo, erro: "sem tempo nesta execução, tenta na próxima verificação" });
+      if (enviados.length >= MAX_ENVIOS_POR_EXECUCAO) {
+        falhas.push({ id: t.a.id, tipo: t.tipo, erro: "fila cheia nesta execução, tenta na próxima verificação" });
         continue;
       }
       if (!t.a.telefone) {
