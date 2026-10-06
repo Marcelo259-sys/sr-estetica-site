@@ -76,23 +76,22 @@ export default async function handler(req, res) {
       ...pend2h.map((a) => ({ a, tipo: "r2h", texto: mensagemR2h(a) })),
     ];
 
-    /* A conta do WASender em uso agora (período de teste) só permite 1
-       mensagem por minuto — bem mais restrito que o limite anterior (1 a
-       cada 5s). Com esse espaçamento, tentar caber uma fila grande numa
-       execução só estourou o tempo máximo da função mesmo com folga (erro
-       FUNCTION_INVOCATION_TIMEOUT). Em vez de arriscar isso de novo, cada
-       execução manda no máximo umas poucas mensagens; o que sobrar fica
-       pendente (nunca é marcado como enviado até o envio realmente
-       funcionar) e é pego sozinho na verificação seguinte, que roda a
-       cada 15 minutos. */
-    const ESPACAMENTO_MS = 62000;
-    const MAX_ENVIOS_POR_EXECUCAO = 2;
+    /* a "account protection" do WASender bloqueia mais de 1 mensagem a cada
+       5s (HTTP 429) — por isso a pausa entre cada envio da fila. Uma pausa
+       bem maior (62s) foi usada temporariamente enquanto a conta estava no
+       período de teste, limitado a 1 msg/min — removido depois do upgrade.
+       Ainda assim, deixa de fora da execução quem não couber no tempo
+       disponível, em vez de arriscar estourar o limite da função: fica
+       pendente e é pego sozinho na verificação seguinte. */
+    const ESPACAMENTO_MS = 5500;
+    const LIMITE_EXECUCAO_MS = 200000; // deixa folga antes do maxDuration
+    const inicio = Date.now();
     const enviados = [];
     const falhas = [];
     let precisaEsperar = false;
     for (const t of tarefas) {
-      if (enviados.length >= MAX_ENVIOS_POR_EXECUCAO) {
-        falhas.push({ id: t.a.id, tipo: t.tipo, erro: "fila cheia nesta execução, tenta na próxima verificação" });
+      if (Date.now() - inicio > LIMITE_EXECUCAO_MS) {
+        falhas.push({ id: t.a.id, tipo: t.tipo, erro: "sem tempo nesta execução, tenta na próxima verificação" });
         continue;
       }
       if (!t.a.telefone) {
