@@ -113,6 +113,31 @@ export async function atualizarPagamento(mes, id, pagamento) {
   return atualizarCampo(mes, id, { pagamento });
 }
 
+/* Soma um lançamento (sinal, pagamento ou estorno) ao pagamento de um
+   agendamento, mantendo o histórico e derivando o status a partir do
+   valor total do agendamento x valorPago acumulado. Usa o valor de
+   "atual" lido na hora de cada tentativa de escrita (nunca um valor
+   checado antes), igual ao resto das escritas deste arquivo — evita
+   basear o cálculo em dado já desatualizado. */
+export async function lancarPagamento(mes, id, lancamento) {
+  return atualizarCampo(mes, id, (atual) => {
+    const base = atual.pagamento || { status: "pendente", valorPago: 0, lancamentos: [] };
+    const registro = {
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      tipo: lancamento.tipo,
+      valor: Number(lancamento.valor) || 0,
+      forma: lancamento.forma || null,
+      obs: lancamento.obs || "",
+      data: new Date().toISOString(),
+    };
+    const lancamentos = [...(base.lancamentos || []), registro];
+    const valorPago = Math.max(0, Number(base.valorPago || 0) + registro.valor);
+    const total = Number(atual.total) || 0;
+    const status = valorPago <= 0 ? "pendente" : valorPago >= total ? "pago" : "parcial";
+    return { pagamento: { status, valorPago, lancamentos, atualizadoEm: new Date().toISOString() } };
+  });
+}
+
 /* tipo: "confirmacao" | "r24h" | "r2h" — marca (ou desmarca) que aquele
    lembrete já foi enviado, sem mexer nos outros dois */
 export async function atualizarLembrete(mes, id, tipo, valor) {

@@ -1,18 +1,35 @@
 /* Devolve os números do painel. Protegido por senha (env PAINEL_SENHA). */
 import { lerMes, senhaOk } from "./_dados.js";
+import { lerMesDespesas } from "./_despesas.js";
 
-const NOME_FORMA = { pix: "Pix", debito: "Cartão débito", credito: "Cartão crédito", dinheiro: "Dinheiro" };
+const NOME_FORMA = { pix: "Pix", debito: "Cartão débito", credito: "Cartão crédito", dinheiro: "Dinheiro", outros: "Outros" };
 
 const statusPgtoDe = (a) => (a.pagamento && a.pagamento.status) || "pendente";
-const valorPagoDe = (a) =>
-  statusPgtoDe(a) === "pago" ? Number(a.pagamento && a.pagamento.valorPago) || Number(a.total) || 0 : 0;
+/* "recebido" conta o valor que realmente entrou — pago OU parcial (sinal).
+   Um pagamento parcial não é zero recebido (dinheiro entrou de verdade),
+   mas também não é o total do serviço (só o que já caiu). */
+const valorPagoDe = (a) => {
+  const st = statusPgtoDe(a);
+  return st === "pago" || st === "parcial" ? Number(a.pagamento && a.pagamento.valorPago) || 0 : 0;
+};
+const saldoPendenteDe = (a) => Math.max(0, (Number(a.total) || 0) - valorPagoDe(a));
 /* cancelado e bloqueio (compromisso pessoal da Simone) não contam em
    faturamento/ranking/clientes/lembretes — só ocupam o horário */
 const ativo = (a) => a.status !== "cancelado" && !a.bloqueio;
 const soma = (lista) => lista.filter(ativo).reduce((t, a) => t + (Number(a.total) || 0), 0);
 const somaRecebido = (lista) => lista.filter(ativo).reduce((t, a) => t + valorPagoDe(a), 0);
-const somaPendente = (lista) =>
-  lista.filter((a) => ativo(a) && statusPgtoDe(a) !== "pago").reduce((t, a) => t + (Number(a.total) || 0), 0);
+const somaPendente = (lista) => lista.filter(ativo).reduce((t, a) => t + saldoPendenteDe(a), 0);
+
+const despesaAtiva = (d) => !d.excluido;
+const somaDespesasPagas = (lista) =>
+  lista.filter((d) => despesaAtiva(d) && d.status === "pago").reduce((t, d) => t + (Number(d.valor) || 0), 0);
+const somaDespesasPendentes = (lista) =>
+  lista.filter((d) => despesaAtiva(d) && d.status !== "pago").reduce((t, d) => t + (Number(d.valor) || 0), 0);
+const somaSinais = (lista) =>
+  lista.filter(ativo).reduce((t, a) => {
+    const lancs = (a.pagamento && a.pagamento.lancamentos) || [];
+    return t + lancs.filter((l) => l.tipo === "sinal").reduce((s, l) => s + (Number(l.valor) || 0), 0);
+  }, 0);
 
 function mesAnterior(mes) {
   const [ano, m] = mes.split("-").map(Number);
@@ -90,6 +107,15 @@ export default async function handler(req, res) {
     const porMes = new Map([[mes, doMes], [mesAnt, doMesAnterior]]);
     extras.forEach((m, i) => porMes.set(m, outros[i]));
 
+    // mesmos meses, mas de despesas — em paralelo, mesmo padrão
+    const [despesasDoMes, despesasDoMesAnterior, ...despesasOutros] = await Promise.all([
+      lerMesDespesas(mes),
+      lerMesDespesas(mesAnt),
+      ...extras.map((m) => lerMesDespesas(m)),
+    ]);
+    const despesasPorMes = new Map([[mes, despesasDoMes], [mesAnt, despesasDoMesAnterior]]);
+    extras.forEach((m, i) => despesasPorMes.set(m, despesasOutros[i]));
+
     const doDia = doMes.filter((a) => a.data === hoje);
     const doHojeReal = (porMes.get(mesHojeReal) || []).filter((a) => a.data === hojeReal);
     const doAmanhaReal = (porMes.get(mesAmanhaReal) || []).filter((a) => a.data === amanhaReal);
@@ -111,29 +137,63 @@ export default async function handler(req, res) {
     );
     const ranking = [...cont.values()].sort((a, b) => b.vezes - a.vezes).slice(0, 10);
 
-    // formas de pagamento (só do que já foi confirmado como pago, no mês)
+    /* formas de pagamento: soma por LANÇAMENTO (sinal/pagamento), não por
+       atendimento — um atendimento pode ter sinal no Pix e saldo no
+       cartão, por exemplo, então o mesmo atendimento pode somar em mais
+       de uma forma. Estorno não entra (não é recebimento).
+       Agendamentos antigos (de antes do sinal/pagamento parcial existir)
+       não têm "lancamentos" — só um "forma" solto no pagamento. Pra esses,
+       trata como um lançamento único equivalente, sem perder o histórico
+       de quem já pagou. */
     const contForma = new Map();
-    doMes.filter((a) => ativo(a) && statusPgtoDe(a) === "pago").forEach((a) => {
-      const f = (a.pagamento && a.pagamento.forma) || "outro";
-      const at = contForma.get(f) || { forma: f, nome: NOME_FORMA[f] || "Não informado", vezes: 0, total: 0 };
-      at.vezes += 1;
-      at.total += valorPagoDe(a);
-      contForma.set(f, at);
+    doMes.filter(ativo).forEach((a) => {
+      const pg = a.pagamento || {};
+      const lancs = pg.lancamentos && pg.lancamentos.length
+        ? pg.lancamentos.filter((l) => l.tipo !== "estorno")
+        : pg.status === "pago"
+          ? [{ forma: pg.forma || "outros", valor: Number(pg.valorPago) || Number(a.total) || 0 }]
+          : [];
+      lancs.forEach((l) => {
+        const f = l.forma || "outros";
+        const at = contForma.get(f) || { forma: f, nome: NOME_FORMA[f] || "Outros", vezes: 0, total: 0 };
+        at.vezes += 1;
+        at.total += Number(l.valor) || 0;
+        contForma.set(f, at);
+      });
     });
     const formasPagamento = [...contForma.values()].sort((a, b) => b.total - a.total);
 
     // série diária (14 dias) — cruza no máximo o mês atual e o anterior
     const combinadoDias = [...doMes, ...doMesAnterior];
+    const despesasCombinadoDias = [...despesasDoMes, ...despesasDoMesAnterior];
     const serieDiaria = ultimosDias(hoje, 14).map((dia) => {
       const lista = combinadoDias.filter((a) => a.data === dia);
-      return { dia, total: soma(lista), recebido: somaRecebido(lista) };
+      const despesasLista = despesasCombinadoDias.filter((d) => despesaAtiva(d) && d.status === "pago" && d.dataPagamento === dia);
+      return {
+        dia, total: soma(lista), recebido: somaRecebido(lista),
+        despesa: despesasLista.reduce((t, d) => t + (Number(d.valor) || 0), 0),
+      };
     });
 
     // série mensal (6 meses)
     const serieMensal = meses6.map((m) => {
       const lista = porMes.get(m) || [];
-      return { mes: m, total: soma(lista), recebido: somaRecebido(lista) };
+      const despesasLista = despesasPorMes.get(m) || [];
+      return { mes: m, total: soma(lista), recebido: somaRecebido(lista), despesa: somaDespesasPagas(despesasLista) };
     });
+
+    // despesas pagas do mês atual, por categoria (gráfico)
+    const contCategoria = new Map();
+    despesasDoMes.filter((d) => despesaAtiva(d) && d.status === "pago").forEach((d) => {
+      const at = contCategoria.get(d.categoria) || { categoria: d.categoria, total: 0, vezes: 0 };
+      at.total += Number(d.valor) || 0;
+      at.vezes += 1;
+      contCategoria.set(d.categoria, at);
+    });
+    const despesasPorCategoria = [...contCategoria.values()].sort((a, b) => b.total - a.total);
+
+    const pagosMes = doMes.filter((a) => ativo(a) && statusPgtoDe(a) === "pago");
+    const despesasPagasMes = somaDespesasPagas(despesasDoMes);
 
     /* lembretes pendentes — confirmação olha o mês inteiro (a partir de hoje),
        24h olha só amanhã, 2h olha só hoje e dentro de uma janela próxima */
@@ -184,14 +244,22 @@ export default async function handler(req, res) {
         clientesMes: clientesMes.size,
         faturamentoDia: soma(doDia),
         faturamentoMes: soma(doMes),
-        ticketMedioMes: doMes.filter(ativo).length ? soma(doMes) / doMes.filter(ativo).length : 0,
+        /* ticket médio: só sobre atendimentos já pagos (recebido ÷ qtd paga) —
+           antes considerava todos os ativos, pagos ou não */
+        atendimentosPagosMes: pagosMes.length,
+        ticketMedioMes: pagosMes.length ? somaRecebido(doMes) / pagosMes.length : 0,
         recebidoDia: somaRecebido(doDia),
         pendenteDia: somaPendente(doDia),
         recebidoMes: somaRecebido(doMes),
         pendenteMes: somaPendente(doMes),
+        totalSinaisMes: somaSinais(doMes),
+        despesasMes: despesasPagasMes,
+        despesasPendentesMes: somaDespesasPendentes(despesasDoMes),
+        lucroLiquidoMes: somaRecebido(doMes) - despesasPagasMes,
       },
       ranking,
       formasPagamento,
+      despesasPorCategoria,
       serieDiaria,
       serieMensal,
       lembretesPendentes,

@@ -105,6 +105,7 @@ h3.subh small{font-family:Inter,sans-serif;font-size:12.5px;color:var(--muted);f
 .pg-badge{font-size:11px;font-weight:700;letter-spacing:.02em;border-radius:999px;padding:3px 10px;white-space:nowrap}
 .pg-badge.pago{background:#E6F4EC;color:var(--ok)}
 .pg-badge.pendente{background:#FFF3DC;color:#9A6414}
+.pg-badge.parcial{background:#FCE8CC;color:#A8560A}
 .pg-badge.salvando{background:#F3EDEA;color:var(--muted)}
 .pg-badge.cancelado{background:#F7E2E2;color:#B3453D}
 .pg-link{font-size:11.5px;color:var(--rose-d);font-weight:600;text-decoration:underline;text-underline-offset:2px;
@@ -159,6 +160,9 @@ h3.subh small{font-family:Inter,sans-serif;font-size:12.5px;color:var(--muted);f
 .chart-legenda i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:-1px}
 .chart-legenda .rec i{background:var(--ok)}
 .chart-legenda .pend i{background:var(--gold-l)}
+.chart-legenda .desp i{background:#B3453D}
+.bd .cols{display:flex;align-items:flex-end;gap:3px}
+.bd .col-desp{width:8px;border-radius:3px 3px 1px 1px;background:#B3453D;opacity:.75}
 
 .aviso{background:#FFF6E6;border:1px solid var(--gold-l);color:#9A6414;border-radius:12px;
   padding:10px 12px;font-size:12.5px;margin-top:14px}
@@ -204,6 +208,27 @@ footer{text-align:center;font-size:11.5px;color:var(--muted);padding:26px 0 0}
 .novo-salvar[disabled]{opacity:.6}
 .novo-cancelar{border:1px solid var(--line);background:#fff;color:var(--ink-2)}
 .novo-aviso{font-size:12.5px;color:#B3453D;margin-top:8px;min-height:16px}
+
+/* ---------- sinal / pagamento parcial ---------- */
+.pg-saldo{font-size:11.5px;color:var(--muted);white-space:nowrap}
+.pg-sinal{display:flex;align-items:center;gap:6px;margin-top:4px;width:100%}
+.pg-sinal input{width:90px;border:1px solid var(--line);border-radius:8px;padding:6px 8px;font-size:12.8px}
+.pg-sinal button{flex:0 0 auto;border:1px solid var(--line);background:#fff;border-radius:999px;
+  padding:6px 12px;font-size:11.8px;font-weight:600;color:var(--ink-2)}
+.pg-historico{font-size:11.5px;color:var(--muted);margin-top:4px;line-height:1.6}
+
+/* ---------- despesas ---------- */
+.csv-btn{flex:0 0 auto;font-size:12px;font-weight:700;color:var(--ink-2);border:1px solid var(--line);
+  border-radius:999px;padding:7px 14px;background:#fff}
+.despesa-item{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px dashed var(--line)}
+.despesa-item:last-child{border-bottom:0}
+.despesa-item .c{flex:1;min-width:0}
+.despesa-item .c b{display:block;font-size:14.5px;font-weight:600}
+.despesa-item .c span{display:block;font-size:12.5px;color:var(--muted);line-height:1.4}
+.despesa-item .v{font-size:14px;font-weight:600;white-space:nowrap;text-align:right}
+.pg-badge.vencido{background:#F7E2E2;color:#B3453D}
+.despesa-cat{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);
+  font-weight:700;margin-bottom:2px}
 </style>
 </head>
 <body>
@@ -321,23 +346,63 @@ footer{text-align:center;font-size:11.5px;color:var(--muted);padding:26px 0 0}
       <div class="legenda">Riscado = já ocupado. Considera 30 em 30 minutos, dentro do horário de funcionamento.</div>
     </div>
 
-    <h2>Controle financeiro</h2>
+    <div class="h-linha">
+      <h2>Controle financeiro</h2>
+      <button class="csv-btn" id="btnExportarCsv" type="button">Exportar CSV</button>
+    </div>
     <div class="kpis" id="kpisFin"></div>
+
+    <div class="h-linha">
+      <h3 class="subh" style="margin:0">Despesas <small>no mês</small></h3>
+      <button class="novo-btn" id="btnNovaDespesa" type="button">+ Nova despesa</button>
+    </div>
+    <div class="bloco novo-form" id="despesaForm" hidden>
+      <label for="despDescricao">Descrição</label>
+      <input id="despDescricao" placeholder="Ex.: Produtos de higiene">
+
+      <label for="despCategoria">Categoria</label>
+      <select id="despCategoria"></select>
+
+      <label for="despValor">Valor (R$)</label>
+      <input type="number" id="despValor" min="0" step="0.01" placeholder="0,00">
+
+      <label for="despVencimento">Vencimento</label>
+      <input type="date" id="despVencimento">
+
+      <label for="despRecorrencia">Recorrência</label>
+      <select id="despRecorrencia">
+        <option value="">Não se repete</option>
+        <option value="mensal">Mensal</option>
+      </select>
+
+      <label for="despObservacoes">Observações (opcional)</label>
+      <input id="despObservacoes" placeholder="Opcional">
+
+      <div class="novo-aviso" id="despAviso"></div>
+      <div class="novo-acoes">
+        <button class="novo-cancelar" id="btnDespCancelar" type="button">Cancelar</button>
+        <button class="novo-salvar" id="btnDespSalvar" type="button">Salvar despesa</button>
+      </div>
+    </div>
+    <div class="bloco" id="despesas"></div>
 
     <h3 class="subh">Faturamento por dia <small>últimos 14 dias</small></h3>
     <div class="bloco" style="padding:14px">
       <div class="chart" id="chartDias"></div>
-      <div class="chart-legenda"><span class="rec"><i></i>Recebido</span><span class="pend"><i></i>Pendente</span></div>
+      <div class="chart-legenda"><span class="rec"><i></i>Recebido</span><span class="pend"><i></i>Pendente</span><span class="desp"><i></i>Despesa</span></div>
     </div>
 
     <h3 class="subh">Faturamento por mês <small>últimos 6 meses</small></h3>
     <div class="bloco" style="padding:14px">
       <div class="chart" id="chartMeses"></div>
-      <div class="chart-legenda"><span class="rec"><i></i>Recebido</span><span class="pend"><i></i>Pendente</span></div>
+      <div class="chart-legenda"><span class="rec"><i></i>Recebido</span><span class="pend"><i></i>Pendente</span><span class="desp"><i></i>Despesa</span></div>
     </div>
 
     <h3 class="subh">Formas de pagamento <small>no mês</small></h3>
     <div class="bloco" id="formas"></div>
+
+    <h3 class="subh">Despesas por categoria <small>pagas no mês</small></h3>
+    <div class="bloco" id="despesasCategoria"></div>
 
     <h2>Serviços mais realizados <small style="font-size:13px;color:var(--muted);font-weight:400">no mês</small></h2>
     <div class="bloco" id="ranking"></div>
@@ -365,7 +430,9 @@ const mh = (m) => String(Math.floor(m/60)).padStart(2,"0") + ":" + String(m%60).
 
 function hojeSP(){ return new Date().toLocaleDateString("sv-SE", {timeZone:"America/Sao_Paulo"}); }
 
-const NOME_FORMA = {pix:"Pix", debito:"Cartão débito", credito:"Cartão crédito", dinheiro:"Dinheiro"};
+const NOME_FORMA = {pix:"Pix", debito:"Cartão débito", credito:"Cartão crédito", dinheiro:"Dinheiro", outros:"Outros"};
+const CATEGORIAS_DESPESA = ["Materiais", "Produtos de higiene", "Aluguel", "Água e energia",
+  "Internet e telefone", "Marketing", "Cursos", "Equipamentos", "Taxas de cartão", "Impostos", "Outras"];
 const MESES_ABREV = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
 const NOME_CLINICA = "SR Estética e Bem Estar";
 const URL_SITE = "https://www.sresteticaebemestar.com.br";
@@ -505,29 +572,81 @@ async function carregar(){
   $("#subtitulo").textContent = "carregando…";
   try{
     desenhar(await buscarRelatorio(dia, mes), dia);
+    carregarDespesas(mes);
   }catch(e){
     $("#subtitulo").textContent = "falha ao carregar";
     $("#agenda").innerHTML = `<div class="vazio">Não consegui carregar os dados.<br>${e.message}</div>`;
   }
 }
 
-/* linha de status de pagamento dentro de cada atendimento */
+/* a "forma" de um pagamento vem do último lançamento (sinal/pagamento) que
+   não seja estorno; agendamentos antigos (de antes do sinal existir) não
+   têm "lancamentos" — caem no "forma" solto que já tinham */
+function formaAtualDe(p){
+  if(p.lancamentos && p.lancamentos.length){
+    const uteis = p.lancamentos.filter((l) => l.tipo !== "estorno");
+    if(uteis.length) return uteis[uteis.length - 1].forma;
+  }
+  return p.forma || null;
+}
+function historicoPagamentoHtml(p){
+  if(!p.lancamentos || !p.lancamentos.length) return "";
+  const linhas = p.lancamentos.map((l) => {
+    const sinal = l.tipo === "estorno" ? "−" : "+";
+    const rotulo = l.tipo === "sinal" ? "sinal" : l.tipo === "estorno" ? "estorno" : "pagamento";
+    return `${sinal}${money(Math.abs(l.valor))} · ${rotulo}${l.forma ? " · " + (NOME_FORMA[l.forma] || l.forma) : ""}`;
+  });
+  return `<div class="pg-historico">${linhas.join("<br>")}</div>`;
+}
+function chipsFormaHtml(id){
+  return `<div class="pg-formas" data-formas="${id}">
+    <button class="pg-chip" data-forma="pix" data-id="${id}">Pix</button>
+    <button class="pg-chip" data-forma="debito" data-id="${id}">Débito</button>
+    <button class="pg-chip" data-forma="credito" data-id="${id}">Crédito</button>
+    <button class="pg-chip" data-forma="dinheiro" data-id="${id}">Dinheiro</button>
+  </div>`;
+}
+
+/* linha de status de pagamento dentro de cada atendimento — agora com
+   suporte a pagamento parcial (sinal + saldo), não só pago/pendente */
 function linhaPagamento(a){
-  const p = a.pagamento || {status:"pendente"};
+  const p = a.pagamento || {status:"pendente", valorPago:0};
+  const valorPago = Number(p.valorPago) || 0;
+  const saldo = Math.max(0, (Number(a.total) || 0) - valorPago);
+
   if(p.status === "pago"){
+    const forma = formaAtualDe(p);
     return `<div class="pgto" data-pgto-de="${a.id}">
-      <span class="pg-badge pago">Pago${p.forma ? " · " + (NOME_FORMA[p.forma] || p.forma) : ""}</span>
+      <span class="pg-badge pago">Pago${forma ? " · " + (NOME_FORMA[forma] || forma) : ""}</span>
       <button class="pg-link" data-desfazer="${a.id}">desfazer</button>
+      ${historicoPagamentoHtml(p)}
     </div>`;
   }
+
+  if(p.status === "parcial"){
+    return `<div class="pgto" data-pgto-de="${a.id}">
+      <span class="pg-badge parcial">Parcial — pago ${money(valorPago)} de ${money(a.total)}</span>
+      <span class="pg-saldo">faltam ${money(saldo)}</span>
+      <button class="pg-link" data-abrir-pgto="${a.id}">completar saldo</button>
+      <button class="pg-link" data-desfazer="${a.id}">desfazer tudo</button>
+      ${chipsFormaHtml(a.id)}
+      ${historicoPagamentoHtml(p)}
+    </div>`;
+  }
+
   return `<div class="pgto" data-pgto-de="${a.id}">
     <span class="pg-badge pendente">Pendente</span>
     <button class="pg-link" data-abrir-pgto="${a.id}">registrar pagamento</button>
-    <div class="pg-formas" data-formas="${a.id}">
-      <button class="pg-chip" data-forma="pix" data-id="${a.id}">Pix</button>
-      <button class="pg-chip" data-forma="debito" data-id="${a.id}">Débito</button>
-      <button class="pg-chip" data-forma="credito" data-id="${a.id}">Crédito</button>
-      <button class="pg-chip" data-forma="dinheiro" data-id="${a.id}">Dinheiro</button>
+    ${chipsFormaHtml(a.id)}
+    <div class="pg-sinal">
+      <input type="number" min="0" step="0.01" placeholder="Sinal R$" data-sinal-valor="${a.id}">
+      <select data-sinal-forma="${a.id}">
+        <option value="pix">Pix</option>
+        <option value="dinheiro">Dinheiro</option>
+        <option value="debito">Débito</option>
+        <option value="credito">Crédito</option>
+      </select>
+      <button class="pg-link" data-registrar-sinal="${a.id}">Registrar sinal</button>
     </div>
   </div>`;
 }
@@ -567,8 +686,14 @@ function renderLembretes(d){
 
 /* gráficos de barra — colunas empilhadas (recebido embaixo, pendente em cima),
    altura proporcional ao maior valor da série */
+/* altura da coluna de despesa usa a MESMA escala (max) da receita, pra dar
+   pra comparar visualmente as duas barras lado a lado */
+function colDespesa(despesa, max, ALT){
+  const h = Math.round((Number(despesa) || 0) / max * ALT);
+  return h > 0 ? `<div class="col-desp" style="height:${h}px"></div>` : "";
+}
 function barrasDias(serie){
-  const max = Math.max(1, ...serie.map((x) => x.total));
+  const max = Math.max(1, ...serie.map((x) => x.total), ...serie.map((x) => x.despesa || 0));
   const ALT = 84;
   return serie.map((x) => {
     const hTotal = Math.round(x.total / max * ALT);
@@ -576,17 +701,20 @@ function barrasDias(serie){
     const hPend = Math.max(0, hTotal - hRec);
     const dd = x.dia.split("-")[2];
     const zero = hTotal <= 0;
-    return `<div class="bd" title="${dd}: ${money(x.total)} (${money(x.recebido)} recebido)">
-      <div class="col${zero ? " zero" : ""}" style="height:${zero ? 3 : hTotal}px">
-        <div class="seg seg-pend" style="height:${hPend}px"></div>
-        <div class="seg seg-rec" style="height:${hRec}px"></div>
+    return `<div class="bd" title="${dd}: ${money(x.total)} (${money(x.recebido)} recebido, ${money(x.despesa || 0)} despesa)">
+      <div class="cols">
+        <div class="col${zero ? " zero" : ""}" style="height:${zero ? 3 : hTotal}px">
+          <div class="seg seg-pend" style="height:${hPend}px"></div>
+          <div class="seg seg-rec" style="height:${hRec}px"></div>
+        </div>
+        ${colDespesa(x.despesa, max, ALT)}
       </div>
       <span>${dd}</span>
     </div>`;
   }).join("");
 }
 function barrasMeses(serie){
-  const max = Math.max(1, ...serie.map((x) => x.total));
+  const max = Math.max(1, ...serie.map((x) => x.total), ...serie.map((x) => x.despesa || 0));
   const ALT = 84;
   return serie.map((x) => {
     const hTotal = Math.round(x.total / max * ALT);
@@ -595,10 +723,13 @@ function barrasMeses(serie){
     const [ano, mm] = x.mes.split("-");
     const label = MESES_ABREV[Number(mm) - 1];
     const zero = hTotal <= 0;
-    return `<div class="bd" title="${label}/${ano}: ${money(x.total)} (${money(x.recebido)} recebido)">
-      <div class="col${zero ? " zero" : ""}" style="height:${zero ? 3 : hTotal}px">
-        <div class="seg seg-pend" style="height:${hPend}px"></div>
-        <div class="seg seg-rec" style="height:${hRec}px"></div>
+    return `<div class="bd" title="${label}/${ano}: ${money(x.total)} (${money(x.recebido)} recebido, ${money(x.despesa || 0)} despesa)">
+      <div class="cols">
+        <div class="col${zero ? " zero" : ""}" style="height:${zero ? 3 : hTotal}px">
+          <div class="seg seg-pend" style="height:${hPend}px"></div>
+          <div class="seg seg-rec" style="height:${hRec}px"></div>
+        </div>
+        ${colDespesa(x.despesa, max, ALT)}
       </div>
       <span>${label}</span>
     </div>`;
@@ -617,14 +748,27 @@ function desenhar(d, dia){
     <div class="kpi"><span>Faturamento do mês</span><b style="font-size:24px">${money(t.faturamentoMes)}</b><small>ticket ${money(t.ticketMedioMes)}</small></div>
     <div class="kpi"><span>Livres hoje</span><b id="kpiLivres">—</b><small>horários de 30 min</small></div>`;
 
+  const lucro = Number(t.lucroLiquidoMes) || 0;
   $("#kpisFin").innerHTML = `
     <div class="kpi ok"><span>Recebido hoje</span><b>${money(t.recebidoDia)}</b></div>
     <div class="kpi warn"><span>Pendente hoje</span><b>${money(t.pendenteDia)}</b></div>
     <div class="kpi ok"><span>Recebido no mês</span><b>${money(t.recebidoMes)}</b></div>
-    <div class="kpi warn"><span>Pendente no mês</span><b>${money(t.pendenteMes)}</b></div>`;
+    <div class="kpi warn"><span>Pendente no mês</span><b>${money(t.pendenteMes)}</b></div>
+    <div class="kpi warn"><span>Despesas do mês</span><b>${money(t.despesasMes)}</b><small>${money(t.despesasPendentesMes)} pendente</small></div>
+    <div class="kpi ${lucro >= 0 ? "ok" : "warn"}"><span>Lucro líquido do mês</span><b>${money(lucro)}</b><small>recebido − despesas pagas</small></div>
+    <div class="kpi"><span>Sinais recebidos no mês</span><b>${money(t.totalSinaisMes)}</b></div>
+    <div class="kpi"><span>Atendimentos pagos</span><b>${t.atendimentosPagosMes}</b><small>ticket médio ${money(t.ticketMedioMes)}</small></div>`;
 
   $("#chartDias").innerHTML = barrasDias(d.serieDiaria || []);
   $("#chartMeses").innerHTML = barrasMeses(d.serieMensal || []);
+
+  const dcat = d.despesasPorCategoria || [];
+  const topoCat = dcat.length ? dcat[0].total : 1;
+  $("#despesasCategoria").innerHTML = dcat.length ? dcat.map((c) => `
+    <div class="rank">
+      <div class="b"><b>${c.categoria}</b><div class="barra"><i style="width:${Math.round(c.total / topoCat * 100)}%"></i></div></div>
+      <div class="q">${c.vezes}× · ${money(c.total)}</div>
+    </div>`).join("") : `<div class="vazio">Nenhuma despesa paga neste mês ainda.</div>`;
 
   renderLembretes(d);
 
@@ -714,13 +858,34 @@ $("#agenda").addEventListener("click", async (e) => {
   const chip = e.target.closest("[data-forma]");
   if(chip){
     chip.disabled = true;
-    await marcarPagamento(chip.dataset.id, "pago", chip.dataset.forma);
+    const lista = (ULTIMO_RELATORIO && ULTIMO_RELATORIO.atendimentosDoDia) || [];
+    const item = lista.find((x) => x.id === chip.dataset.id);
+    if(!item){ chip.disabled = false; return; }
+    const saldo = Math.max(0, item.total - (Number(item.pagamento && item.pagamento.valorPago) || 0));
+    await lancarPagamento(chip.dataset.id, {tipo:"pagamento", valor: saldo, forma: chip.dataset.forma});
     return;
   }
   const desfazer = e.target.closest("[data-desfazer]");
   if(desfazer){
+    if(!confirm("Desfazer o pagamento deste atendimento? Isso volta o valor recebido para zero.")) return;
     desfazer.disabled = true;
-    await marcarPagamento(desfazer.dataset.desfazer, "pendente", null);
+    const lista = (ULTIMO_RELATORIO && ULTIMO_RELATORIO.atendimentosDoDia) || [];
+    const item = lista.find((x) => x.id === desfazer.dataset.desfazer);
+    if(!item){ desfazer.disabled = false; return; }
+    const valorPago = Number(item.pagamento && item.pagamento.valorPago) || 0;
+    if(valorPago <= 0) return;
+    await lancarPagamento(desfazer.dataset.desfazer, {tipo:"estorno", valor: -valorPago, forma:null, obs:"desfeito pelo painel"});
+    return;
+  }
+  const sinalBtn = e.target.closest("[data-registrar-sinal]");
+  if(sinalBtn){
+    const id = sinalBtn.dataset.registrarSinal;
+    const inputValor = document.querySelector(`[data-sinal-valor="${id}"]`);
+    const inputForma = document.querySelector(`[data-sinal-forma="${id}"]`);
+    const valor = Number(inputValor && inputValor.value);
+    if(!(valor > 0)){ if(inputValor) inputValor.focus(); return; }
+    sinalBtn.disabled = true;
+    await lancarPagamento(id, {tipo:"sinal", valor, forma: inputForma ? inputForma.value : "pix"});
     return;
   }
   const cancelar = e.target.closest("[data-cancelar]");
@@ -772,10 +937,16 @@ function aplicarStatusLocal(id, novoStatus, item){
     t.atendimentosMes += sinal;
     t.faturamentoDia += sinal * item.total;
     t.faturamentoMes += sinal * item.total;
-    const pago = item.pagamento && item.pagamento.status === "pago";
-    const valorPago = pago ? (item.pagamento.valorPago || item.total) : 0;
-    if(pago){ t.recebidoDia += sinal * valorPago; t.recebidoMes += sinal * valorPago; }
-    else { t.pendenteDia += sinal * item.total; t.pendenteMes += sinal * item.total; }
+    /* cancelar/reabrir entra e sai do cálculo igual ao servidor faz
+       (ativo() exclui cancelado por completo) — vale pros três estados
+       de pagamento, não só pago/pendente */
+    const status = item.pagamento && item.pagamento.status;
+    const contado = (status === "pago" || status === "parcial") ? (Number(item.pagamento.valorPago) || 0) : 0;
+    const saldo = Math.max(0, item.total - contado);
+    t.recebidoDia += sinal * contado; t.recebidoMes += sinal * contado;
+    t.pendenteDia += sinal * saldo; t.pendenteMes += sinal * saldo;
+    if(status === "pago") t.atendimentosPagosMes = Math.max(0, (t.atendimentosPagosMes || 0) + sinal);
+    t.ticketMedioMes = t.atendimentosPagosMes ? t.recebidoMes / t.atendimentosPagosMes : 0;
 
     /* cancelou: some da fila de lembretes também — não faz sentido lembrar
        cliente de um atendimento que não vai mais acontecer */
@@ -812,11 +983,14 @@ function removerLembreteLocal(id, tipo){
   renderLembretes(ULTIMO_RELATORIO);
 }
 
-async function marcarPagamento(id, status, forma){
+/* Soma um lançamento (sinal, pagamento ou estorno) ao pagamento de um
+   atendimento. Se passar do saldo devido sem confirmação, o servidor
+   recusa (409) e aqui a gente pergunta antes de tentar de novo já
+   confirmando — nunca estoura o saldo sem a Simone saber. */
+async function lancarPagamento(id, lancamento, confirmarExcedente){
   const lista = (ULTIMO_RELATORIO && ULTIMO_RELATORIO.atendimentosDoDia) || [];
   const item = lista.find((x) => x.id === id);
   if(!item) return;
-  const valorPago = status === "pago" ? item.total : 0;
   const mes = ($("#dia").value || hojeSP()).slice(0,7);
 
   const wrap = document.querySelector(`.pgto[data-pgto-de="${id}"]`);
@@ -825,18 +999,23 @@ async function marcarPagamento(id, status, forma){
   try{
     const r = await fetch(`/api/pagamento?senha=${encodeURIComponent(SENHA)}`, {
       method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({mes, id, status, forma, valorPago})
+      body: JSON.stringify({mes, id, lancamento, confirmarExcedente: !!confirmarExcedente})
     });
+    if(r.status === 409){
+      const j = await r.json().catch(() => ({}));
+      const msg = `Esse valor passa do saldo devido em ${money(j.excedente || 0)} (saldo era ${money(j.saldoDevido || 0)}).\n\nConfirma mesmo assim?`;
+      if(confirm(msg)) return lancarPagamento(id, lancamento, true);
+      desenhar(ULTIMO_RELATORIO, $("#dia").value || hojeSP());
+      return;
+    }
     if(!r.ok) throw new Error();
     const resp = await r.json();
 
     /* A leitura (GET /api/relatorio) demora a refletir uma escrita recente —
-       chegamos a medir mais de 40s de atraso. Buscar de novo e esperar não
-       é opção. A própria resposta da escrita já confirma o que foi gravado,
-       então usamos ela para atualizar a tela na hora, sem depender de uma
-       leitura nova. Trocar de dia ou reabrir o painel volta a buscar tudo
-       do servidor, já sincronizado. */
-    aplicarPagamentoLocal(id, resp.agendamento.pagamento, item);
+       chegamos a medir mais de 40s de atraso. A própria resposta da escrita
+       já confirma o que foi gravado, então usamos ela pra atualizar a tela
+       na hora, sem depender de uma leitura nova. */
+    aplicarPagamentoLocal(id, resp.agendamento.pagamento, item, lancamento);
   }catch(e){
     if(wrap) wrap.innerHTML = `<span class="pg-badge pendente">Não salvou</span>
       <button class="pg-link" data-abrir-pgto="${id}">tentar de novo</button>`;
@@ -846,41 +1025,40 @@ async function marcarPagamento(id, status, forma){
 /* Aplica o resultado confirmado da gravação ao estado já carregado na tela
    (item, KPIs de recebido/pendente, gráficos e ranking de formas), sem
    precisar buscar o relatório de novo no servidor. */
-function aplicarPagamentoLocal(id, novoPagamento, item){
+function aplicarPagamentoLocal(id, novoPagamento, item, lancamento){
   if(!ULTIMO_RELATORIO) return;
   const antigoStatus = (item.pagamento && item.pagamento.status) || "pendente";
-  const antigaForma = item.pagamento && item.pagamento.forma;
-  const antigoValor = (item.pagamento && item.pagamento.valorPago) || 0;
-  const total = item.total;
+  const antigoContado = (antigoStatus === "pago" || antigoStatus === "parcial") ? (Number(item.pagamento && item.pagamento.valorPago) || 0) : 0;
 
   const novoStatus = novoPagamento.status;
-  const novaForma = novoPagamento.forma;
-  const novoValor = novoPagamento.valorPago || 0;
+  const novoContado = (novoStatus === "pago" || novoStatus === "parcial") ? (Number(novoPagamento.valorPago) || 0) : 0;
 
   item.pagamento = novoPagamento;
 
   const t = ULTIMO_RELATORIO.totais;
-  const deltaRecebido = (novoStatus === "pago" ? novoValor : 0) - (antigoStatus === "pago" ? antigoValor : 0);
-  const deltaPendente = (novoStatus === "pago" ? 0 : total) - (antigoStatus === "pago" ? 0 : total);
-  t.recebidoDia += deltaRecebido; t.pendenteDia += deltaPendente;
-  t.recebidoMes += deltaRecebido; t.pendenteMes += deltaPendente;
+  const deltaRecebido = novoContado - antigoContado;
+  t.recebidoDia += deltaRecebido; t.pendenteDia -= deltaRecebido;
+  t.recebidoMes += deltaRecebido; t.pendenteMes -= deltaRecebido;
+  if(lancamento && lancamento.tipo === "sinal") t.totalSinaisMes = (t.totalSinaisMes || 0) + lancamento.valor;
+  if(novoStatus === "pago" && antigoStatus !== "pago") t.atendimentosPagosMes = (t.atendimentosPagosMes || 0) + 1;
+  if(novoStatus !== "pago" && antigoStatus === "pago") t.atendimentosPagosMes = Math.max(0, (t.atendimentosPagosMes || 0) - 1);
+  t.ticketMedioMes = t.atendimentosPagosMes ? t.recebidoMes / t.atendimentosPagosMes : 0;
 
   const dia = $("#dia").value || hojeSP();
   const mesRef = dia.slice(0,7);
   (ULTIMO_RELATORIO.serieDiaria || []).forEach((s) => { if(s.dia === dia) s.recebido += deltaRecebido; });
   (ULTIMO_RELATORIO.serieMensal || []).forEach((s) => { if(s.mes === mesRef) s.recebido += deltaRecebido; });
 
-  const fp = ULTIMO_RELATORIO.formasPagamento || (ULTIMO_RELATORIO.formasPagamento = []);
-  if(antigoStatus === "pago" && antigaForma){
-    const e = fp.find((f) => f.forma === antigaForma);
-    if(e){ e.vezes -= 1; e.total -= antigoValor; }
+  /* ranking de formas: só ajusta localmente pra lançamentos não-estorno com
+     forma definida (cobre os dois botões mais usados: pagar e dar sinal);
+     um estorno não mexe aqui — reconcilia sozinho na próxima recarga */
+  if(lancamento && lancamento.tipo !== "estorno" && lancamento.forma){
+    const fp = ULTIMO_RELATORIO.formasPagamento || (ULTIMO_RELATORIO.formasPagamento = []);
+    let e = fp.find((f) => f.forma === lancamento.forma);
+    if(!e){ e = {forma:lancamento.forma, nome:NOME_FORMA[lancamento.forma] || lancamento.forma, vezes:0, total:0}; fp.push(e); }
+    e.vezes += 1; e.total += lancamento.valor;
+    ULTIMO_RELATORIO.formasPagamento = fp.sort((a,b) => b.total - a.total);
   }
-  if(novoStatus === "pago" && novaForma){
-    let e = fp.find((f) => f.forma === novaForma);
-    if(!e){ e = {forma:novaForma, nome:NOME_FORMA[novaForma] || novaForma, vezes:0, total:0}; fp.push(e); }
-    e.vezes += 1; e.total += novoValor;
-  }
-  ULTIMO_RELATORIO.formasPagamento = fp.filter((f) => f.vezes > 0).sort((a,b) => b.total - a.total);
 
   desenhar(ULTIMO_RELATORIO, dia);
 }
@@ -1121,6 +1299,181 @@ $("#btnNovoSalvar").onclick = async () => {
   }finally{
     btn.disabled = false; btn.textContent = "Salvar agendamento";
   }
+};
+
+/* ---------------- despesas ---------------- */
+let DESPESAS = [];
+$("#despCategoria").innerHTML = CATEGORIAS_DESPESA.map((c) => `<option value="${c}">${c}</option>`).join("");
+
+async function carregarDespesas(mes){
+  try{
+    const r = await fetch(`/api/despesas?senha=${encodeURIComponent(SENHA)}&mes=${mes}`, {cache:"no-store"});
+    if(!r.ok){ DESPESAS = []; renderDespesas(); return; }
+    const j = await r.json();
+    DESPESAS = Array.isArray(j.despesas) ? j.despesas : [];
+  }catch(e){ DESPESAS = []; }
+  renderDespesas();
+}
+
+function despesaItemHtml(d){
+  const st = d.statusExibicao || d.status;
+  const badge = st === "pago"
+    ? `<span class="pg-badge pago">Paga${d.forma ? " · " + (NOME_FORMA[d.forma] || d.forma) : ""}</span>`
+    : st === "vencido"
+      ? `<span class="pg-badge vencido">Vencida</span>`
+      : `<span class="pg-badge pendente">Pendente</span>`;
+  const acao = d.status === "pago"
+    ? `<button class="pg-link" data-desp-reabrir="${d.id}">reabrir</button>`
+    : `<button class="pg-link" data-desp-pagar="${d.id}">marcar paga</button>`;
+  return `<div class="despesa-item">
+    <div class="c">
+      <span class="despesa-cat">${d.categoria}</span>
+      <b>${d.descricao}</b>
+      <span>Vencimento ${fmtDataBR(d.vencimento)}${d.recorrencia ? " · recorrente" : ""}</span>
+      <div class="pgto">
+        ${badge}
+        ${acao}
+        <button class="pg-link" data-desp-excluir="${d.id}">excluir</button>
+      </div>
+    </div>
+    <div class="v">${money(d.valor)}</div>
+  </div>`;
+}
+
+function renderDespesas(){
+  $("#despesas").innerHTML = DESPESAS.length
+    ? DESPESAS.map(despesaItemHtml).join("")
+    : `<div class="vazio">Nenhuma despesa lançada neste mês ainda.</div>`;
+}
+
+function despesaAbrir(){
+  $("#despesaForm").hidden = false;
+  $("#btnNovaDespesa").textContent = "Fechar";
+  $("#despDescricao").value = ""; $("#despValor").value = ""; $("#despObservacoes").value = "";
+  $("#despCategoria").value = CATEGORIAS_DESPESA[0];
+  $("#despVencimento").value = $("#dia").value || hojeSP();
+  $("#despRecorrencia").value = "";
+  $("#despAviso").textContent = "";
+}
+function despesaFechar(){
+  $("#despesaForm").hidden = true;
+  $("#btnNovaDespesa").textContent = "+ Nova despesa";
+}
+$("#btnNovaDespesa").onclick = () => { $("#despesaForm").hidden ? despesaAbrir() : despesaFechar(); };
+$("#btnDespCancelar").onclick = despesaFechar;
+
+$("#btnDespSalvar").onclick = async () => {
+  const descricao = $("#despDescricao").value.trim();
+  const valor = Number($("#despValor").value);
+  const vencimento = $("#despVencimento").value;
+  const aviso = $("#despAviso");
+  aviso.textContent = "";
+
+  if(!descricao){ aviso.textContent = "Falta a descrição."; return; }
+  if(!(valor > 0)){ aviso.textContent = "Valor inválido."; return; }
+  if(!vencimento){ aviso.textContent = "Falta a data de vencimento."; return; }
+
+  const btn = $("#btnDespSalvar");
+  btn.disabled = true; btn.textContent = "Salvando…";
+  try{
+    const r = await fetch(`/api/despesas?senha=${encodeURIComponent(SENHA)}`, {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({
+        descricao, categoria: $("#despCategoria").value, valor, vencimento,
+        recorrencia: $("#despRecorrencia").value || null,
+        observacoes: $("#despObservacoes").value.trim(),
+      }),
+    });
+    if(!r.ok) throw new Error();
+    const resp = await r.json();
+    despesaFechar();
+    const mesAtual = ($("#dia").value || hojeSP()).slice(0,7);
+    if(resp.despesa.mes === mesAtual){ DESPESAS.push(resp.despesa); renderDespesas(); }
+  }catch(e){
+    aviso.textContent = "Não consegui salvar agora. Tente de novo em instantes.";
+  }finally{
+    btn.disabled = false; btn.textContent = "Salvar despesa";
+  }
+};
+
+async function despesaAcao(id, acao, extra){
+  const mes = ($("#dia").value || hojeSP()).slice(0,7);
+  const corpo = Object.assign({mes, id, acao}, extra || {});
+  const r = await fetch(`/api/despesa?senha=${encodeURIComponent(SENHA)}`, {
+    method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(corpo),
+  });
+  if(!r.ok) throw new Error();
+  return (await r.json()).despesa;
+}
+
+$("#despesas").addEventListener("click", async (e) => {
+  const pagar = e.target.closest("[data-desp-pagar]");
+  if(pagar){
+    pagar.disabled = true;
+    try{
+      const atualizado = await despesaAcao(pagar.dataset.despPagar, "pagar");
+      const idx = DESPESAS.findIndex((d) => d.id === atualizado.id);
+      if(idx !== -1) DESPESAS[idx] = atualizado;
+      renderDespesas();
+    }catch(e){ alert("Não consegui salvar agora. Tente de novo."); pagar.disabled = false; }
+    return;
+  }
+  const reabrir = e.target.closest("[data-desp-reabrir]");
+  if(reabrir){
+    reabrir.disabled = true;
+    try{
+      const atualizado = await despesaAcao(reabrir.dataset.despReabrir, "reabrir");
+      const idx = DESPESAS.findIndex((d) => d.id === atualizado.id);
+      if(idx !== -1) DESPESAS[idx] = atualizado;
+      renderDespesas();
+    }catch(e){ alert("Não consegui salvar agora. Tente de novo."); reabrir.disabled = false; }
+    return;
+  }
+  const excluir = e.target.closest("[data-desp-excluir]");
+  if(excluir){
+    if(!confirm("Excluir esta despesa? Ela some da lista, mas o registro fica guardado para consulta futura.")) return;
+    excluir.disabled = true;
+    try{
+      await despesaAcao(excluir.dataset.despExcluir, "excluir");
+      DESPESAS = DESPESAS.filter((d) => d.id !== excluir.dataset.despExcluir);
+      renderDespesas();
+    }catch(e){ alert("Não consegui excluir agora. Tente de novo."); excluir.disabled = false; }
+  }
+});
+
+/* ---------------- exportar CSV ---------------- */
+function csvEscape(v){
+  const s = String(v == null ? "" : v);
+  return /[";\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+}
+function baixarCsv(nome, linhas){
+  const conteudo = linhas.map((l) => l.map(csvEscape).join(";")).join("\r\n");
+  const blob = new Blob(["﻿" + conteudo], {type:"text/csv;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = nome;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+/* exporta o que já está carregado na tela: atendimentos do DIA selecionado
+   (é o que o painel tem em memória — a lista completa do mês não é
+   carregada de uma vez) e despesas do MÊS inteiro (essas sim vêm todas) */
+$("#btnExportarCsv").onclick = () => {
+  if(!ULTIMO_RELATORIO) return;
+  const dia = $("#dia").value || hojeSP();
+  const mes = dia.slice(0,7);
+
+  const linhasAtend = [["Data","Hora","Cliente","Serviços","Total","Status pagamento","Valor pago"]];
+  (ULTIMO_RELATORIO.atendimentosDoDia || []).forEach((a) => {
+    if(a.bloqueio) return;
+    linhasAtend.push([dia, a.hora, a.cliente, (a.servicos||[]).join(", "), a.total,
+      (a.pagamento && a.pagamento.status) || "pendente", (a.pagamento && a.pagamento.valorPago) || 0]);
+  });
+  baixarCsv(`atendimentos-${dia}.csv`, linhasAtend);
+
+  const linhasDesp = [["Vencimento","Descrição","Categoria","Valor","Status","Data pagamento"]];
+  DESPESAS.forEach((d) => linhasDesp.push([d.vencimento, d.descricao, d.categoria, d.valor, d.status, d.dataPagamento || ""]));
+  baixarCsv(`despesas-${mes}.csv`, linhasDesp);
 };
 
 /* já logado nesta sessão? entra direto */
