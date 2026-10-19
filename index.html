@@ -526,6 +526,7 @@ const CONFIG = {
              4:["09:00","18:00"], 5:["09:00","18:00"], 6:["09:00","16:00"]},
   // feriados sem atendimento normal (AAAA-MM-DD) — horário diferenciado, confirmar no zap
   feriados: ["2026-09-07","2026-10-12","2026-11-02","2026-11-15","2026-11-20","2026-12-25","2027-01-01"],
+  agendaAte: "2027-02-28", // até quando a agenda aceita marcação (AAAA-MM-DD)
   slotMin: 30,          // intervalo entre horários
   antecedenciaMin: 60,  // não oferecer horário nos próximos X minutos de hoje
   /* CUPONS — o código é comparado sem acento e em maiúsculas,
@@ -802,10 +803,12 @@ function syncAll(keepOpen){
 /* ============================================================================
    6) AGENDA — dias e horários
    ========================================================================== */
-function openDays(n = 14){
+function openDays(ateISO = CONFIG.agendaAte){
   const out = [], d = new Date(); d.setHours(0,0,0,0);
-  for(let i = 0; out.length < n && i < 90; i++){
+  const fim = ateISO ? new Date(ateISO + "T00:00:00") : null;
+  for(let i = 0; i < 400; i++){
     const day = new Date(d); day.setDate(d.getDate() + i);
+    if(fim && day > fim) break;
     const h = CONFIG.horarios[day.getDay()];
     if(!h) continue;
     if(CONFIG.feriados.includes(ymd(day))) continue;
@@ -946,7 +949,7 @@ function renderSheet(){
   $$("[data-x]").forEach(b => b.onclick = () => toggle(b.dataset.x, true));
 
   /* --- dias --- */
-  const days = openDays(14);
+  const days = openDays();
   if(!state.date || !days.some(d => ymd(d) === state.date)) state.date = days.length ? ymd(days[0]) : null;
   $("#days").innerHTML = days.map(d => `
     <button class="chip${ymd(d) === state.date ? " on" : ""}" data-day="${ymd(d)}">
