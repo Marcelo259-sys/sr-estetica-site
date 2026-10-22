@@ -23,6 +23,13 @@ function somaDias(diaISO, n) {
   d.setDate(d.getDate() + n);
   return d.toLocaleDateString("sv-SE");
 }
+/* minutos entre agora e o instante exato do agendamento. São Paulo é
+   UTC-3 o ano todo (sem horário de verão desde 2019), então "-03:00" fixo
+   dá o instante absoluto certo sem depender do fuso de onde a função roda. */
+function faltamMinutos(dataISO, horaHHMM) {
+  const alvo = new Date(`${dataISO}T${horaHHMM || "00:00"}:00-03:00`).getTime();
+  return (alvo - Date.now()) / 60000;
+}
 /* bloqueio (compromisso pessoal da Simone) já nasce com lembretes marcados
    como enviados, mas exclui aqui também por clareza e defesa dupla */
 const ativo = (a) => a.status !== "cancelado" && !a.bloqueio;
@@ -66,8 +73,19 @@ export default async function handler(req, res) {
     const pendConfirmacao = todasAtivas.filter(
       (a) => ativo(a) && a.data >= hojeReal && !(a.lembretes && a.lembretes.confirmacao)
     );
+    /* antes mandava assim que a data virava "amanhã" — ou seja, sempre na
+       virada da meia-noite, muito antes das 24h reais e num horário ruim
+       pro cliente. Agora só manda quando faltam entre 3h e 25h pro horário
+       marcado: cobre a janela de 24h de verdade (com folga pro cron de
+       15 em 15 min) e nunca dispara logo após meia-noite pra um horário
+       qualquer do dia seguinte. Abaixo de 3h já é território do lembrete
+       de 2h, então não se sobrepõe. */
     const pend24h = doAmanha
-      .filter((a) => ativo(a) && !(a.lembretes && a.lembretes.r24h))
+      .filter((a) => {
+        if (!ativo(a) || (a.lembretes && a.lembretes.r24h)) return false;
+        const faltam = faltamMinutos(amanhaReal, a.hora);
+        return faltam > 180 && faltam <= 1500;
+      })
       .map((a) => ({ ...a, __mes: mesAmanha }));
     const pend2h = doHoje
       .filter((a) => {
