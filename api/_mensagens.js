@@ -20,19 +20,34 @@ function nomesServicos(servicos) {
   return (servicos || []).map((s) => (s && s.nome) || s).join(", ");
 }
 
+/* sinal de 30% só é exigido a partir de R$50 no total do agendamento
+   (era R$100 — reduzido a pedido em 2026-10-22). Abaixo disso, confirma
+   sem pedir sinal nem Pix. */
+const PISO_SINAL = 50;
+
 export function mensagemConfirmacao(a) {
-  return [
+  const exigeSinal = Number(a.total) >= PISO_SINAL;
+  const linhas = [
     `✨ Olá, ${primeiroNome(a.cliente)}!`,
     `Passando para confirmar seu atendimento com a Simone Ribeiro – Estética e Bem-Estar.`, "",
     `⏰ ${diaSemanaEData(a.data)}, às ${a.hora}`,
     `*Serviço(s):* ${nomesServicos(a.servicos)}`,
     `📍 Local: Rua Rafino, 51 - Chácara Junqueira`, "",
-    `*Regras do agendamento:* sinal de 30% do valor do procedimento.`,
-    `Pix: 15997133089`, "",
-    `⚠️ Caso não consiga comparecer, avise com 24h de antecedência — devolvemos o valor pago. Sem aviso, o valor pago não é devolvido.`,
+  ];
+  if (exigeSinal) {
+    linhas.push(
+      `*Regras do agendamento:* sinal de 30% do valor do procedimento.`,
+      `Pix: 15997133089`, "",
+      `⚠️ Caso não consiga comparecer, avise com 24h de antecedência — devolvemos o valor pago. Sem aviso, o valor pago não é devolvido.`,
+    );
+  } else {
+    linhas.push(`⚠️ Caso não consiga comparecer, avise com 24h de antecedência, por favor.`);
+  }
+  linhas.push(
     `Tolerância de 15 minutos de atraso, para não prejudicar o próximo atendimento!`, "",
     `Estamos ansiosos para te receber e cuidar de você! 💖💆‍♀️`,
-  ].join("\n");
+  );
+  return linhas.join("\n");
 }
 
 export function mensagemR24h(a) {
