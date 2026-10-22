@@ -31,8 +31,16 @@ export default async function handler(req, res) {
   const esperado = process.env.CRON_SECRET;
   if (!esperado) return res.status(503).json({ erro: "CRON_SECRET não configurado" });
   const url = new URL(req.url, "http://x");
+  /* duas formas de autenticar: o cron nativo da Vercel manda sozinho o
+     cabeçalho "Authorization: Bearer <CRON_SECRET>" (por isso o caminho em
+     vercel.json não carrega mais o segredo na URL, visível no repositório
+     público); o cron-job.org (externo) não tem esse recurso, então continua
+     mandando por querystring/cabeçalho próprio, configurado manualmente lá. */
+  const viaCabecalhoVercel = req.headers["authorization"] === `Bearer ${esperado}`;
   const recebido = url.searchParams.get("segredo") || req.headers["x-cron-secret"] || "";
-  if (recebido !== esperado) return res.status(401).json({ erro: "não autorizado" });
+  if (!viaCabecalhoVercel && recebido !== esperado) {
+    return res.status(401).json({ erro: "não autorizado" });
+  }
 
   try {
     const hojeReal = new Date().toLocaleDateString("sv-SE", { timeZone: "America/Sao_Paulo" });
