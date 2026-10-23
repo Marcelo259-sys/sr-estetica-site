@@ -527,6 +527,7 @@ const CONFIG = {
   // feriados sem atendimento normal (AAAA-MM-DD) — horário diferenciado, confirmar no zap
   feriados: ["2026-09-07","2026-10-12","2026-11-02","2026-11-15","2026-11-20","2026-12-25","2027-01-01"],
   agendaAte: "2027-02-28", // até quando a agenda aceita marcação (AAAA-MM-DD)
+  pausaAlmoco: ["11:30","12:30"], // horário reservado todo dia, não aparece pra agendar (null desativa)
   slotMin: 30,          // intervalo entre horários
   antecedenciaMin: 60,  // não oferecer horário nos próximos X minutos de hoje
   /* CUPONS — o código é comparado sem acento e em maiúsculas,
@@ -824,9 +825,15 @@ function slotsFor(date){
   const abre = hm2min(h[0]), fecha = hm2min(h[1]);
   const now = new Date(), hoje = ymd(now) === ymd(date);
   const minStart = hoje ? now.getHours()*60 + now.getMinutes() + CONFIG.antecedenciaMin : 0;
+  // pausa do almoço: vale todo dia, não precisa cadastrar bloqueio manual um a um
+  const almoco = CONFIG.pausaAlmoco;
+  const almocoIni = almoco ? hm2min(almoco[0]) : null;
+  const almocoFim = almoco ? hm2min(almoco[1]) : null;
   const out = [];
   for(let m = abre; m + dTot <= fecha; m += CONFIG.slotMin){
-    if(m >= minStart) out.push(min2hm(m));
+    if(m < minStart) continue;
+    if(almoco && m < almocoFim && m + dTot > almocoIni) continue;
+    out.push(min2hm(m));
   }
   return out;
 }
