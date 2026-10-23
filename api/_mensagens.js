@@ -19,6 +19,9 @@ function primeiroNome(nome) {
 function nomesServicos(servicos) {
   return (servicos || []).map((s) => (s && s.nome) || s).join(", ");
 }
+function money(n) {
+  return "R$ " + (Number(n) || 0).toFixed(2).replace(".", ",");
+}
 
 /* sinal de 30% só é exigido a partir de R$50 no total do agendamento
    (era R$100 — reduzido a pedido em 2026-10-22). Abaixo disso, confirma
@@ -35,8 +38,9 @@ export function mensagemConfirmacao(a) {
     `📍 Local: Rua Rafino, 51 - Chácara Junqueira`, "",
   ];
   if (exigeSinal) {
+    const valorSinal = Number(a.total) * 0.3;
     linhas.push(
-      `*Regras do agendamento:* sinal de 30% do valor do procedimento.`,
+      `*Regras do agendamento:* sinal de 30% do valor do procedimento (*${money(valorSinal)}*).`,
       `Pix: 15997133089`, "",
       `⚠️ Caso não consiga comparecer, avise com 24h de antecedência — devolvemos o valor pago. Sem aviso, o valor pago não é devolvido.`,
     );
