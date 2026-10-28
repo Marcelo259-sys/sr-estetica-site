@@ -38,16 +38,20 @@ export async function lerClientes() {
 }
 
 /* Guarda (ou atualiza) o par nome+telefone de uma cliente real — nunca
-   chamar para um bloqueio de agenda pessoal, que não é uma cliente. */
+   chamar para um bloqueio de agenda pessoal, que não é uma cliente.
+
+   Casa por NOME, nunca por telefone: duas pessoas reais podem dividir o
+   mesmo WhatsApp (celular de família, alguém que agenda para outra
+   pessoa). Casar por telefone faz o nome mais recente a aparecer naquele
+   número apagar o anterior sem avisar — já aconteceu de sair confirmação
+   com o nome de uma cliente para o número salvo com o nome de outra. */
 export async function upsertCliente(nome, telefone) {
   const nomeLimpo = String(nome || "").trim();
   if (!nomeLimpo) return;
   const telefoneLimpo = String(telefone || "").trim();
 
   const atuais = await lerClientes();
-  const idx = telefoneLimpo
-    ? atuais.findIndex((c) => c.telefone === telefoneLimpo)
-    : atuais.findIndex((c) => c.nome.toLowerCase() === nomeLimpo.toLowerCase());
+  const idx = atuais.findIndex((c) => c.nome.toLowerCase() === nomeLimpo.toLowerCase());
 
   const registro = { nome: nomeLimpo, telefone: telefoneLimpo, atualizadoEm: new Date().toISOString() };
   if (idx === -1) atuais.push(registro);

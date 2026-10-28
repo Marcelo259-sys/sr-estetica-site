@@ -26,14 +26,16 @@ export default async function handler(req, res) {
       .filter((p) => /^agendamentos\/\d{4}-\d{2}\.json$/.test(p))
       .map((p) => p.slice("agendamentos/".length, -".json".length));
 
-    /* chave = telefone (se tiver) ou nome em minúsculas — mantém sempre o
-       registro mais recente pra cada cliente */
+    /* chave = nome em minúsculas (nunca telefone — duas clientes reais podem
+       dividir o mesmo WhatsApp, e casar por telefone faria uma apagar o
+       nome da outra; ver o mesmo cuidado em _clientes.js::upsertCliente) —
+       mantém sempre o registro mais recente pra cada nome */
     const mapa = new Map();
     const upsert = (nome, telefone, quando) => {
       const nomeLimpo = String(nome || "").trim();
       if (!nomeLimpo) return;
       const telefoneLimpo = String(telefone || "").trim();
-      const chave = telefoneLimpo || nomeLimpo.toLowerCase();
+      const chave = nomeLimpo.toLowerCase();
       const atual = mapa.get(chave);
       const quandoStr = String(quando || "");
       if (!atual || quandoStr > String(atual.atualizadoEm || "")) {
