@@ -55,13 +55,21 @@ export function mensagemConfirmacao(a) {
 }
 
 export function mensagemR24h(a) {
-  return [
+  const exigeSinal = Number(a.total) >= PISO_SINAL;
+  const linhas = [
     `Olá, ${primeiroNome(a.cliente)}! Passando para lembrar que seu atendimento é amanhã, ${fmtDataBR(a.data)}, às ${a.hora}.`, "",
     `*Serviço(s):* ${nomesServicos(a.servicos)}`, "",
-    "Podemos confirmar seu horário?",
-  ].join("\n");
+  ];
+  if (exigeSinal && !(a.pagamento && (a.pagamento.status === "pago" || a.pagamento.status === "parcial"))) {
+    linhas.push(`*Lembrete:* sinal de 30% do valor do procedimento (*${money(Number(a.total) * 0.3)}*). Pix: 15997133089`, "");
+  }
+  linhas.push("Podemos confirmar seu horário?");
+  return linhas.join("\n");
 }
 
 export function mensagemR2h(a) {
-  return `Olá, ${primeiroNome(a.cliente)}! Seu atendimento é hoje às ${a.hora}. Estamos te esperando!`;
+  const exigeSinal = Number(a.total) >= PISO_SINAL;
+  const semPagamento = exigeSinal && !(a.pagamento && (a.pagamento.status === "pago" || a.pagamento.status === "parcial"));
+  const aviso = semPagamento ? ` Lembrando do sinal de 30% (${money(Number(a.total) * 0.3)}) — Pix: 15997133089.` : "";
+  return `Olá, ${primeiroNome(a.cliente)}! Seu atendimento é hoje às ${a.hora}. Estamos te esperando!${aviso}`;
 }
